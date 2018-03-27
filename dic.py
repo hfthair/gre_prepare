@@ -65,6 +65,13 @@ def main():
             elif w == 'rr':
                 random_show(T, 10, True)
             continue
+        elif w.startswith('-'):
+            # if w.startswith('-r'):
+            #     try:
+            #         random_show(T, int(w[2:]), False)
+            #     except:
+            #         pass
+            continue
 
         print(Fore.YELLOW + ' ' + w)
         print('===============' * 4)
