@@ -21,7 +21,9 @@ def cache_add(w, d):
 def cache_show(withcn):
     if withcn:
         for x in cache:
-            print(Fore.GREEN + x + Fore.RESET + '\t' + cache[x])
+            t = x + ' ' * 17
+            t = t[:20]
+            print(Fore.GREEN + t + Fore.RESET + '\t' + cache[x])
     else:
         for x in cache:
             print(Fore.GREEN + x)
@@ -31,7 +33,10 @@ def random_show(T, limit, withcn):
         random_show.res = T.select().order_by((fn.random()*T.count).desc()).limit(limit)
     if withcn:
         for i in random_show.res:
-            print(Fore.GREEN + i.title + '\t' + '|'.join(i.brief.splitlines()))
+            t = i.title + ' ' * 17
+            t = t[:20]
+            print(Fore.GREEN + t + Fore.RESET + '\t' +
+                '|'.join(i.brief.splitlines()))
     else:
         for i in random_show.res:
             print(Fore.GREEN + i.title)
