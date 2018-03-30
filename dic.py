@@ -78,12 +78,14 @@ def main():
             #         pass
             continue
 
-        print(Fore.YELLOW + ' ' + w)
+        print(Fore.GREEN + ' ' + w)
         print('===============' * 4)
         try:
             brief, detail = search(w)
-            show = detail if detail else brief
-            print(Fore.YELLOW + show)
+            # show = detail if detail else brief
+            print(Fore.GREEN + brief)
+            print('===============' * 4)
+            print(Fore.YELLOW + detail)
 
             cache_add(w, brief)
 
