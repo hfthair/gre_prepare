@@ -56,3 +56,6 @@ def search(word):
 
     return menu, colins[:-1] if colins else ''
 
+if __name__ == '__main__':
+    a, b = search('novice')
+    print(a)
