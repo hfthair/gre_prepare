@@ -4,19 +4,30 @@ from iciba import search
 from model import Read, Word
 from colorama import init, Fore, Style
 from peewee import fn
+from fill_gre3000.fill_to_db import gre3000
 
 def save(T, title, brief, detail):
     finds = T.select().where(T.title == title)
     if finds:
-        finds[0].count = finds[0].count + 1
-        finds[0].save()
+        find = finds[0]
+        find.count = find.count + 1
+
+        # todo: rm this
+        # fix i
+        ret = gre3000(title)
+        if ret and ret[2] != find.brief:
+            find.brief = ret[2]
+            find.iciba = ret[3]
+            find.save()
+
+        find.save()
     else:
         find = T(title=title, brief=brief, iciba=detail, merriam='')
         find.save()
 
 cache = {}
 def cache_add(w, d):
-    cache[w] = '|'.join(d.splitlines())
+    cache[w] = ' | '.join(d.splitlines())
 
 def cache_show(withcn):
     if withcn:
@@ -35,8 +46,18 @@ def random_show(T, limit, withcn):
         for i in random_show.res:
             t = i.title + ' ' * 18
             t = t[:18]
+            # todo: rm this
+            # fix i
+            ret = gre3000(i.title)
+            if ret and ret[2] != i.brief:
+                i.brief = ret[2]
+                i.iciba = ret[3]
+                i.save()
+
             print(Fore.GREEN + t + Fore.RESET +
-                '|'.join(i.brief.splitlines()))
+                ' | '.join(i.brief.splitlines()))
+
+
     else:
         for i in random_show.res:
             print(Fore.GREEN + i.title)
@@ -81,8 +102,14 @@ def main():
         print(Fore.GREEN + ' ' + w)
         print('===============' * 4)
         try:
-            brief, detail = search(w)
-            # show = detail if detail else brief
+            brief = None
+            detail = None
+            ret = gre3000(w)
+            if ret:
+                _, p, brief, detail = ret
+            else:
+                brief, detail = search(w)
+
             print(Fore.GREEN + brief)
             print('===============' * 4)
             print(Fore.YELLOW + detail)

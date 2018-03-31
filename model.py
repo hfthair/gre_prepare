@@ -28,6 +28,15 @@ class Read(Model):
     class Meta:
         database = db
 
+class GreVerbalCq(Model):
+    title = CharField(unique=True)
+    show = CharField(max_length=2048)
+    brief = CharField(max_length=1024)
+    pron = CharField(max_length=256)
+    class Meta:
+        database = db
+
+
 with db:
     if not Word.table_exists():
         Word.create_table(True)
