@@ -4,7 +4,7 @@ from iciba import search
 from model import Read, Word
 from colorama import init, Fore, Style
 from peewee import fn
-from fill_gre3000.fill_to_db import gre3000
+from yaoniming3000 import search as gre3000
 
 def save(T, title, brief, detail):
     finds = T.select().where(T.title == title)
@@ -14,11 +14,10 @@ def save(T, title, brief, detail):
 
         # todo: rm this
         # fix i
-        ret = gre3000(title)
-        if ret and ret[2] != find.brief:
-            find.brief = ret[2]
-            find.iciba = ret[3]
-            find.save()
+        if True:
+            ret = gre3000(title)
+            if ret and ret.brief != find.brief:
+                find.brief, find.iciba = ret.brief, ret.full
 
         find.save()
     else:
@@ -46,13 +45,14 @@ def random_show(T, limit, withcn):
         for i in random_show.res:
             t = i.title + ' ' * 18
             t = t[:18]
+
             # todo: rm this
             # fix i
-            ret = gre3000(i.title)
-            if ret and ret[2] != i.brief:
-                i.brief = ret[2]
-                i.iciba = ret[3]
-                i.save()
+            if True:
+                ret = gre3000(i.title)
+                if ret and ret.brief != i.brief:
+                    i.brief, i.iciba = ret.brief, ret.full
+                    i.save()
 
             print(Fore.GREEN + t + Fore.RESET +
                 ' | '.join(i.brief.splitlines()))
@@ -76,7 +76,6 @@ def main():
         w = input(header)
         w = ''.join(x for x in w if x.lower()>='a' and x.lower()<='z' or x in ' -')
         if not w:
-            print('q to quit')
             continue
 
         if len(w) < 3:
@@ -91,13 +90,6 @@ def main():
             elif w == 'rr':
                 random_show(T, 10, True)
             continue
-        elif w.startswith('-'):
-            # if w.startswith('-r'):
-            #     try:
-            #         random_show(T, int(w[2:]), False)
-            #     except:
-            #         pass
-            continue
 
         print(Fore.GREEN + ' ' + w)
         print('===============' * 4)
@@ -106,7 +98,7 @@ def main():
             detail = None
             ret = gre3000(w)
             if ret:
-                _, p, brief, detail = ret
+                brief, detail = ret.brief, ret.full
             else:
                 brief, detail = search(w)
 
