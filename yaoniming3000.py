@@ -54,9 +54,11 @@ if __name__ == '__main__':
     if ran:
         import random
         random.shuffle(s)
-    print('========={}========='.format(len(s)))
+    count = len(s)
+    print('========={}========='.format(count))
 
     i = 0
+    checked = set()
     while True:
         if i >= len(s):
             break
@@ -72,8 +74,13 @@ if __name__ == '__main__':
         if inin == 'q':
             break
         if inin:
+            checked.add(s[i].title)
+            s.append(s[i])
             print(Fore.YELLOW + ' ' + s[i].full)
             print()
+            inin = input()
 
         i += 1
+
+    print('\n'.join(checked))
 
