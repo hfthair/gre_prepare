@@ -29,7 +29,10 @@ with open('gre3000/source_from_github.txt', encoding='utf8') as f:
     tps = (process(i) for i in sp)
     for i in tps:
         tempArray.append(i)
+        if i.title in tempDic:
+            print('!!!!! dupulicated in source --> ' + i.title)
         tempDic[i.title] = i
+
 
 def search(w):
     if w in tempDic:
@@ -37,35 +40,57 @@ def search(w):
 
 # todo: move to sep file
 if __name__ == '__main__':
+
     import sys
     from colorama import init, Fore, Style
     init(autoreset=True)
 
+    s = None
+
     left = None
     right = None
-    ran = True
+    ran = False
     if len(sys.argv) >= 2:
-        l, r = sys.argv[1].split(':')
-        try:
-            l = int(l)
-        except:
-            left = tempArray.index(tempDic[l])
+        if ':' in sys.argv[1]:
+            l, r = sys.argv[1].split(':')
+            try:
+                l = int(l)
+            except:
+                left = tempArray.index(tempDic[l])
 
-        try:
-            r = int(r)
-        except:
-            right = tempArray.index(tempDic[r])
+            try:
+                r = int(r)
+            except:
+                right = tempArray.index(tempDic[r])
 
-        if not right:
-            right = left + r
-        if not left:
-            left = right - r
+            if not right and not left:
+                left, right = l, r
+            elif not right:
+                right = left + r
+            elif not left:
+                left = right - r
+
+            s = tempArray[left:right]
+        else:
+            l = sys.argv[1].lower().replace('list', '')
+            int(l)
+            temp = []
+            import pandas as pd
+            sheet = pd.read_excel('gre3000/GRE3000.xlsx', 'L' + l, header=None)
+            l = sheet[0].values.tolist()
+            print('L ---> {}'.format(len(l)))
+            # temp = [tempDic[i] for i in l if i in tempDic]
+            for i in l:
+                if i in tempDic:
+                    temp.append(tempDic[i])
+                else:
+                    print(i)
+            s = temp
     else:
         sys.exit(0)
     if len(sys.argv) >= 3 and sys.argv[2] == 'r':
-        ran = False
+        ran = True
 
-    s = tempArray[left : right]
     if ran:
         import random
         random.shuffle(s)
