@@ -11,14 +11,6 @@ def save(T, title, brief, detail):
     if finds:
         find = finds[0]
         find.count = find.count + 1
-
-        # todo: rm this
-        # fix i
-        if True:
-            ret = gre3000(title)
-            if ret and ret.brief != find.brief:
-                find.brief, find.iciba = ret.brief, ret.full
-
         find.save()
     else:
         find = T(title=title, brief=brief, iciba=detail, merriam='')
@@ -45,19 +37,8 @@ def random_show(T, limit, withcn):
         for i in random_show.res:
             t = i.title + ' ' * 18
             t = t[:18]
-
-            # todo: rm this
-            # fix i
-            if True:
-                ret = gre3000(i.title)
-                if ret and ret.brief != i.brief:
-                    i.brief, i.iciba = ret.brief, ret.full
-                    i.save()
-
             print(Fore.GREEN + t + Fore.RESET +
                 ' | '.join(i.brief.splitlines()))
-
-
     else:
         for i in random_show.res:
             print(Fore.GREEN + i.title)

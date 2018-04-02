@@ -7,6 +7,7 @@ class Word(object):
     brief = attr.ib()
     full = attr.ib()
 
+
 # todo: save to db
 tempDic = {}
 tempArray = []
@@ -34,34 +35,57 @@ def search(w):
     if w in tempDic:
         return tempDic[w]
 
+# todo: move to sep file
 if __name__ == '__main__':
     import sys
     from colorama import init, Fore, Style
     init(autoreset=True)
 
-    left = ''
-    right = ''
+    left = None
+    right = None
     ran = True
-    if len(sys.argv) >= 3:
-        left = sys.argv[1]
-        right = sys.argv[2]
+    if len(sys.argv) >= 2:
+        l, r = sys.argv[1].split(':')
+        try:
+            l = int(l)
+        except:
+            left = tempArray.index(tempDic[l])
+
+        try:
+            r = int(r)
+        except:
+            right = tempArray.index(tempDic[r])
+
+        if not right:
+            right = left + r
+        if not left:
+            left = right - r
     else:
         sys.exit(0)
-    if len(sys.argv) >= 4 and sys.argv[3] == 'r':
+    if len(sys.argv) >= 3 and sys.argv[2] == 'r':
         ran = False
 
-    s = tempArray[tempArray.index(tempDic[left]) : tempArray.index(tempDic[right]) + 1]
+    s = tempArray[left : right]
     if ran:
         import random
         random.shuffle(s)
     count = len(s)
-    print('========={}========='.format(count))
+    print('========= {} ========='.format(count))
 
     i = 0
-    checked = set()
+    checked = []
     while True:
         if i >= len(s):
-            break
+            if len(checked) > 0:
+                s = checked
+                if ran:
+                    import random
+                    random.shuffle(s)
+                checked = []
+                print('========= re0: {}/{} ========='.format(len(s), count))
+                i = 0
+            else:
+                break
 
         print(str(i) + '. ' + Fore.GREEN + s[i].title, end='')
         inin = input()
@@ -74,8 +98,8 @@ if __name__ == '__main__':
         if inin == 'q':
             break
         if inin:
-            checked.add(s[i].title)
-            s.append(s[i])
+            if s[i] not in checked:
+                checked.append(s[i])
             print(Fore.YELLOW + ' ' + s[i].full)
             print()
             inin = input()
