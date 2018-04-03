@@ -28,13 +28,23 @@ class Read(Model):
     class Meta:
         database = db
 
-class GreVerbalCq(Model):
-    title = CharField(unique=True)
-    show = CharField(max_length=2048)
-    brief = CharField(max_length=1024)
-    pron = CharField(max_length=256)
-    class Meta:
-        database = db
+# class GreVerbalCq(Model):
+#     title = CharField(unique=True)
+#     show = CharField(max_length=2048)
+#     brief = CharField(max_length=1024)
+#     pron = CharField(max_length=256)
+#     class Meta:
+#         database = db
+
+def save(T, title, brief, detail):
+    finds = T.select().where(T.title == title)
+    if finds:
+        find = finds[0]
+        find.count = find.count + 1
+        find.save()
+    else:
+        find = T(title=title, brief=brief, iciba=detail, merriam='')
+        find.save()
 
 
 with db:

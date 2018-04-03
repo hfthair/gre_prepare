@@ -1,20 +1,10 @@
 #encoding=utf-8
 import sys
 from iciba import search
-from model import Read, Word
+from model import Read, Word, save
 from colorama import init, Fore, Style
 from peewee import fn
 from yaoniming3000 import search as gre3000
-
-def save(T, title, brief, detail):
-    finds = T.select().where(T.title == title)
-    if finds:
-        find = finds[0]
-        find.count = find.count + 1
-        find.save()
-    else:
-        find = T(title=title, brief=brief, iciba=detail, merriam='')
-        find.save()
 
 cache = {}
 def cache_add(w, d):

@@ -42,16 +42,18 @@ def search(w):
 if __name__ == '__main__':
 
     import sys
+    import random
     from colorama import init, Fore, Style
     init(autoreset=True)
 
     s = None
-
-    left = None
-    right = None
     ran = False
+    sv = False
+
     if len(sys.argv) >= 2:
         if ':' in sys.argv[1]:
+            left = None
+            right = None
             l, r = sys.argv[1].split(':')
             try:
                 l = int(l)
@@ -88,29 +90,37 @@ if __name__ == '__main__':
             s = temp
     else:
         sys.exit(0)
-    if len(sys.argv) >= 3 and sys.argv[2] == 'r':
-        ran = True
+    if len(sys.argv) >= 3:
+        if 'r' in sys.argv[2]:
+            ran = True
+        if 's' in sys.argv[2]:
+            sv = True
 
     if ran:
-        import random
         random.shuffle(s)
     count = len(s)
     print('========= {} ========='.format(count))
 
     i = 0
+    k = i
     checked = []
     while True:
         if i >= len(s):
             if len(checked) > 0:
                 s = checked
                 if ran:
-                    import random
                     random.shuffle(s)
                 checked = []
                 print('========= re0: {}/{} ========='.format(len(s), count))
                 i = 0
             else:
                 break
+
+        if i - k >= 26:
+            k = i
+            t = checked[:]
+            random.shuffle(t)
+            s[i:i] = t[:len(t)//2+2]
 
         print(str(i) + '. ' + Fore.GREEN + s[i].title, end='')
         inin = input()
@@ -127,9 +137,12 @@ if __name__ == '__main__':
                 checked.append(s[i])
             print(Fore.YELLOW + ' ' + s[i].full)
             print()
+            if sv:
+                from model import Word, save
+                save(Word, s[i].title, s[i].brief, s[i].full)
             inin = input()
 
         i += 1
 
-    print('\n'.join(checked))
+    print('\n'.join(i.title for i in checked))
 
