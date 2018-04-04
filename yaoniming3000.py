@@ -44,111 +44,126 @@ if __name__ == '__main__':
     import sys
     import random
     from colorama import init, Fore, Style
+
     init(autoreset=True)
 
-    s = None
-    rand = False
-    sav = False
-    verify = False
+    def getList(i):
+        temp = []
+        import pandas as pd
+        sheet = pd.read_excel('gre3000/GRE3000.xlsx', 'L' + str(i), header=None)
+        l = sheet[0].values.tolist()
+        print('L ---> {}'.format(len(l)))
+        # temp = [tempDic[w] for w in l]
+        for w in l:
+            if w in tempDic:
+                temp.append(tempDic[w])
+            else:
+                print(w)
+        return temp
 
-    if len(sys.argv) >= 2:
-        if ':' in sys.argv[1]:
-            left = None
-            right = None
-            l, r = sys.argv[1].split(':')
-            try:
-                l = int(l)
-            except:
-                left = tempArray.index(tempDic[l])
+    def main(rang, args=''):
+        rang = str(rang)
+        s = None
+        rand = False
+        sav = False
+        verify = False
 
-            try:
-                r = int(r)
-            except:
-                right = tempArray.index(tempDic[r])
-
-            if not right and not left:
-                left, right = l, r
-            elif not right:
-                right = left + r
-            elif not left:
-                left = right - r
-
-            s = tempArray[left:right]
-        else:
-            l = sys.argv[1].lower().replace('list', '')
-            int(l)
-            temp = []
-            import pandas as pd
-            sheet = pd.read_excel('gre3000/GRE3000.xlsx', 'L' + l, header=None)
-            l = sheet[0].values.tolist()
-            print('L ---> {}'.format(len(l)))
-            # temp = [tempDic[i] for i in l if i in tempDic]
-            for i in l:
-                if i in tempDic:
-                    temp.append(tempDic[i])
-                else:
-                    print(i)
-            s = temp
-    else:
-        sys.exit(0)
-    if len(sys.argv) >= 3:
-        if 'r' in sys.argv[2]:
+        if 'r' in args:
             rand = True
-        if 's' in sys.argv[2]:
+        if 's' in args:
             sav = True
-        if 'v' in sys.argv[2]:
+        if 'v' in args:
             verify = True
 
-    if rand:
-        random.shuffle(s)
-    count = len(s)
-    print('========= {} ========='.format(count))
+        if ':' in rang:
+            l, r = rang.split(':')
+            if l.startswith('list') and l[-1]>='0' and l[-1]<='9':
+                # base on list id
+                left = int(l.lower().replace('list', ''))
+                right = int(r.lower().replace('list', ''))
 
-    i = 0
-    k = i
-    checked = []
-    while True:
-        if i >= len(s):
-            if len(checked) > 0:
-                s = checked
-                if rand:
-                    random.shuffle(s)
-                checked = []
-                print('========= re0: {}/{} ========='.format(len(s), count))
-                i = 0
+                s = []
+                for i in range(left, right):
+                    s += getList(i)
             else:
+                # word1:word2 or word1:number or number:word2
+                left = None
+                right = None
+                try:
+                    l = int(l)
+                except:
+                    left = tempArray.index(tempDic[l])
+
+                try:
+                    r = int(r)
+                except:
+                    right = tempArray.index(tempDic[r])
+
+                if not right and not left:
+                    left, right = l, r
+                elif not right:
+                    right = left + r
+                elif not left:
+                    left = right - r
+
+                s = tempArray[left:right]
+        else:
+            left = int(rang.lower().replace('list', ''))
+            s = getList(left)
+
+        if rand:
+            random.shuffle(s)
+        count = len(s)
+        print('========= {} ========='.format(count))
+
+        i = 0
+        k = i
+        checked = []
+        while True:
+            if i >= len(s):
+                if len(checked) > 0:
+                    s = checked
+                    if rand:
+                        random.shuffle(s)
+                    checked = []
+                    print('========= re0: {}/{} ========='.format(len(s), count))
+                    i = 0
+                else:
+                    break
+
+            if i - k >= 26:
+                t = checked[:]
+                pick = len(t)//5+12
+                k = i + pick
+                random.shuffle(t)
+                s[i:i] = t[:pick]
+
+            print(str(i) + '. ' + Fore.GREEN + s[i].title, end='')
+            inin = input()
+            if inin == 'q':
                 break
 
-        if i - k >= 26:
-            t = checked[:]
-            pick = len(t)//5+12
-            k = i + pick
-            random.shuffle(t)
-            s[i:i] = t[:pick]
+            print('  ' + '\n  '.join(s[i].brief.splitlines()))
 
-        print(str(i) + '. ' + Fore.GREEN + s[i].title, end='')
-        inin = input()
-        if inin == 'q':
-            break
+            inin = input()
+            if inin == 'q':
+                break
+            if inin:
+                if s[i] not in checked:
+                    checked.append(s[i])
+                print(Fore.YELLOW + ' ' + s[i].full)
+                print()
+                if sav:
+                    from model import Word, save
+                    save(Word, s[i].title, s[i].brief, s[i].full)
+                inin = input(':' if verify else '')
+                while verify and inin != s[i].title:
+                    inin = input(':')
 
-        print('  ' + '\n  '.join(s[i].brief.splitlines()))
+            i += 1
 
-        inin = input()
-        if inin == 'q':
-            break
-        if inin:
-            if s[i] not in checked:
-                checked.append(s[i])
-            print(Fore.YELLOW + ' ' + s[i].full)
-            print()
-            if sav:
-                from model import Word, save
-                save(Word, s[i].title, s[i].brief, s[i].full)
-            inin = input(':' if verify else '')
-            while verify and inin != s[i].title:
-                inin = input(':')
+        print('\n'.join(i.title for i in checked))
 
-        i += 1
-
-    print('\n'.join(i.title for i in checked))
+    import fire
+    fire.Fire(main)
 
