@@ -47,8 +47,9 @@ if __name__ == '__main__':
     init(autoreset=True)
 
     s = None
-    ran = False
-    sv = False
+    rand = False
+    sav = False
+    verify = False
 
     if len(sys.argv) >= 2:
         if ':' in sys.argv[1]:
@@ -92,11 +93,13 @@ if __name__ == '__main__':
         sys.exit(0)
     if len(sys.argv) >= 3:
         if 'r' in sys.argv[2]:
-            ran = True
+            rand = True
         if 's' in sys.argv[2]:
-            sv = True
+            sav = True
+        if 'v' in sys.argv[2]:
+            verify = True
 
-    if ran:
+    if rand:
         random.shuffle(s)
     count = len(s)
     print('========= {} ========='.format(count))
@@ -108,7 +111,7 @@ if __name__ == '__main__':
         if i >= len(s):
             if len(checked) > 0:
                 s = checked
-                if ran:
+                if rand:
                     random.shuffle(s)
                 checked = []
                 print('========= re0: {}/{} ========='.format(len(s), count))
@@ -117,10 +120,11 @@ if __name__ == '__main__':
                 break
 
         if i - k >= 26:
-            k = i
             t = checked[:]
+            pick = len(t)//5+12
+            k = i + pick
             random.shuffle(t)
-            s[i:i] = t[:len(t)//2+2]
+            s[i:i] = t[:pick]
 
         print(str(i) + '. ' + Fore.GREEN + s[i].title, end='')
         inin = input()
@@ -137,10 +141,12 @@ if __name__ == '__main__':
                 checked.append(s[i])
             print(Fore.YELLOW + ' ' + s[i].full)
             print()
-            if sv:
+            if sav:
                 from model import Word, save
                 save(Word, s[i].title, s[i].brief, s[i].full)
-            inin = input()
+            inin = input(':' if verify else '')
+            while verify and inin != s[i].title:
+                inin = input(':')
 
         i += 1
 
