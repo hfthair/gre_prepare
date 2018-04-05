@@ -59,7 +59,7 @@ if __name__ == '__main__':
             if w in tempDic:
                 temp.append(tempDic[w])
             else:
-                print(w)
+                print('  ', l.index(w)+1, w)
         return temp
 
     def main(rang, args='', sel=0):
@@ -87,7 +87,7 @@ if __name__ == '__main__':
                 right = int(r.lower().replace('list', ''))
 
                 s = []
-                for i in range(left, right):
+                for i in range(left, right+1):
                     s += getList(i)
             else:
                 # word1:word2 or word1:number or number:word2
@@ -129,50 +129,55 @@ if __name__ == '__main__':
 
         i = 0
         k = i
-        checked = []
+        words_unrecognize = []
+        review_in_process = []
         while True:
             if i >= len(s):
-                if len(checked) > 0:
-                    s = checked
+                if len(words_unrecognize) > 0:
+                    s = words_unrecognize
                     if rand:
                         random.shuffle(s)
-                    checked = []
+                    words_unrecognize = []
                     print('========= re0: {}/{} ========='.format(len(s), count))
                     i = 0
                 else:
                     break
 
             if i - k >= 26:
-                t = checked[:]
+                t = words_unrecognize[:]
                 pick = len(t)//5+12
-                k = i + pick
+                k = i
                 random.shuffle(t)
-                s[i:i] = t[:pick]
+                review_in_process = t[:pick]
 
-            print(str(i) + '. ' + Fore.GREEN + s[i].title, end='')
+            w = s[i]
+            if len(review_in_process) > 0:
+                w = review_in_process[-1]
+                review_in_process = review_in_process[:-1]
+            else:
+                i += 1
+            print(str(i) + '. ' + Fore.GREEN + w.title, end='')
             inin = input()
             if inin == 'q':
                 break
 
-            print('  ' + '\n  '.join(s[i].brief.splitlines()))
+            print('  ' + '\n  '.join(w.brief.splitlines()))
 
             inin = input()
             if inin == 'q':
                 break
             if inin:
-                if s[i] not in checked:
-                    checked.append(s[i])
-                print(Fore.YELLOW + ' ' + s[i].full)
+                if w not in words_unrecognize:
+                    words_unrecognize.append(w)
+                print(Fore.YELLOW + ' ' + w.full)
                 print()
                 if sav:
-                    save(Word, s[i].title, s[i].brief, s[i].full)
+                    save(Word, w.title, w.brief, w.full)
                 inin = input(':' if verify else '')
-                while verify and inin != s[i].title:
+                while verify and inin != w.title:
                     inin = input(':')
 
-            i += 1
-
-        print('\n'.join(i.title for i in checked))
+        print('\n'.join(i.title for i in words_unrecognize))
 
     import fire
     fire.Fire(main)
