@@ -38,7 +38,7 @@ def search(w):
     if w in tempDic:
         return tempDic[w]
 
-# todo: move to sep file
+# todo: file structure
 if __name__ == '__main__':
 
     import sys
@@ -61,7 +61,7 @@ if __name__ == '__main__':
                 print(w)
         return temp
 
-    def main(rang, args=''):
+    def main(rang, args='', sel=0):
         rang = str(rang)
         s = None
         rand = False
@@ -113,6 +113,8 @@ if __name__ == '__main__':
 
         if rand:
             random.shuffle(s)
+            if sel and sel > 0:
+                s = s[:sel+1]
         count = len(s)
         print('========= {} ========='.format(count))
 
