@@ -44,6 +44,7 @@ if __name__ == '__main__':
     import sys
     import random
     from colorama import init, Fore, Style
+    from model import Word, save
 
     init(autoreset=True)
 
@@ -52,7 +53,7 @@ if __name__ == '__main__':
         import pandas as pd
         sheet = pd.read_excel('gre3000/GRE3000.xlsx', 'L' + str(i), header=None)
         l = sheet[0].values.tolist()
-        print('L ---> {}'.format(len(l)))
+        print('L{} ---> {}'.format(i, len(l)))
         # temp = [tempDic[w] for w in l]
         for w in l:
             if w in tempDic:
@@ -67,6 +68,7 @@ if __name__ == '__main__':
         rand = False
         sav = False
         verify = False
+        addition = False
 
         if 'r' in args:
             rand = True
@@ -74,6 +76,8 @@ if __name__ == '__main__':
             sav = True
         if 'v' in args:
             verify = True
+        if 'a' in args:
+            addition = True
 
         if ':' in rang:
             l, r = rang.split(':')
@@ -115,6 +119,11 @@ if __name__ == '__main__':
             random.shuffle(s)
             if sel and sel > 0:
                 s = s[:sel+1]
+            if addition:
+                tt = (tempDic[w.title] for w in Word.ran(len(s)//20+5) if w.title in tempDic)
+                s.extend(tt)
+                random.shuffle(s)
+
         count = len(s)
         print('========= {} ========='.format(count))
 
@@ -156,7 +165,6 @@ if __name__ == '__main__':
                 print(Fore.YELLOW + ' ' + s[i].full)
                 print()
                 if sav:
-                    from model import Word, save
                     save(Word, s[i].title, s[i].brief, s[i].full)
                 inin = input(':' if verify else '')
                 while verify and inin != s[i].title:

@@ -1,4 +1,4 @@
-from peewee import SqliteDatabase, Model, CharField, IntegerField
+from peewee import SqliteDatabase, Model, CharField, IntegerField, fn
 
 db = SqliteDatabase('verbal.db')
 
@@ -14,6 +14,10 @@ class Word(Model):
     count = IntegerField(default=1)
     class Meta:
         database = db
+
+    @staticmethod
+    def ran(cnt):
+        return Word.select().order_by((fn.random()*Word.count).desc()).limit(cnt)
 
 class Read(Model):
     title = CharField(unique=True)
