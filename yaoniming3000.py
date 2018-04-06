@@ -3,7 +3,6 @@ import attr
 @attr.s
 class Word(object):
     title = attr.ib()
-    pronounce = attr.ib()
     brief = attr.ib()
     full = attr.ib()
 
@@ -21,7 +20,7 @@ def process(src):
         return t
 
     brief = '\n'.join(get_briefs(i) for i in lines[1:] if i.startswith(' ♠'))
-    return Word(title, pron, brief, src)
+    return Word(title, brief, src)
 
 with open('gre3000/source_from_github.txt', encoding='utf8') as f:
     c = f.read()
@@ -160,6 +159,9 @@ if __name__ == '__main__':
             inin = input()
             if inin == 'q':
                 break
+            if inin == 'b' and i > 0:
+                i -= 2
+                continue
 
             print('  ' + '\n  '.join(w.brief.splitlines()))
 

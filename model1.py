@@ -6,11 +6,13 @@ class Word(Model):
     title = CharField(unique=True)
     brief_3000 = CharField(max_length=1024, default='')
     full_3000 = CharField(max_length=1024, default='')
+    list_of_book3000 = IntegerField(default=0)
     pronunc = CharField(default='')
     iciba = CharField(max_length=1024, default='')
     colins_iciba = CharField(max_length=2048, default='')
     merriam = CharField(max_length=2048, default='')
-    merriam_eg = CharField(max_length=2048, default='')
+    eg_merriam = CharField(max_length=2048, default='')
+    eg_3000 = CharField(max_length=2048, default='')
 
     count = FloatField(default=1.0)
     class Meta:
@@ -33,16 +35,16 @@ class GreWord(Word):
         return GreWord.select().order_by((fn.random()*GreWord.count).desc()).limit(cnt)
 
     @staticmethod
-    def save_or_update(title):
+    def save_or_update(title, brief='', full='', lx=0):
         finds = GreWord.select().where(GreWord.title == title)
         if finds:
             find = finds[0]
             find.count = find.count + 1.0
             find.save()
         else:
-            pass
-            # find = T(title=title, brief=brief, iciba=detail, merriam='')
-            # find.save()
+            w = GreWord(title=title, brief_3000=brief, \
+                full_3000=full, list_of_book3000=lx)
+            w.save()
 
 
 class OtherWord(Model):
@@ -52,16 +54,23 @@ class OtherWord(Model):
         return OtherWord.select().order_by((fn.random()*OtherWord.count).desc()).limit(cnt)
 
     @staticmethod
-    def save_or_update(title):
+    def save_or_update(title, brief='', full=''):
         finds = OtherWord.select().where(OtherWord.title == title)
         if finds:
             find = finds[0]
             find.count = find.count + 1.0
             find.save()
         else:
-            pass
-            # find = T(title=title, brief=brief, iciba=detail, merriam='')
-            # find.save()
+            w = OtherWord(title=title)
+            gfinds = GreWord.select().where(GreWord.title == title)
+            if gfinds:
+                gfind = gfinds[0]
+                w.brief_3000 = gfind.brief_3000
+                w.full_3000 = gfind.full_3000
+            else:
+                w.iciba = brief
+                w.colins_iciba = full
+            w.save()
 
 
 with db:
