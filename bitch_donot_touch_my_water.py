@@ -2,7 +2,15 @@ import cv2
 import time
 import numpy as np
 
+xxx = time.time()
+
 cap = cv2.VideoCapture(0)
+
+print('initing...')
+for i in range(50):
+    cap.read()
+
+time.sleep(3)
 
 size = (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
 
@@ -12,16 +20,30 @@ kernel = np.ones((5, 5), np.uint8)
 background = None
 
 writer = None
-count = 0
+writer_counter = 0
+
+print('start')
+total_frame = 0
+record_frame = 0
 
 while True:
+    if time.time() - xxx > 3600:
+        print('time over')
+        break
+
+    total_frame += 1
+
     _, frame = cap.read()
 
     if writer:
+        record_frame += 1
+
         writer.write(frame)
-        count -= 1
-        if count <= 0:
+        writer_counter -= 1
+        if writer_counter <= 0:
+            print('write finish!{}'.format(time.strftime("%Y%m%d-%H%M%S")))
             writer = None
+        time.sleep(0.06)
         continue
 
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -36,7 +58,6 @@ while True:
     diff = cv2.dilate(diff, es, iterations=2)
 
     sth = False
-    # 显示矩形框
     image, contours, hierarchy = cv2.findContours(diff.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     for c in contours:
         if cv2.contourArea(c) > 1500:
@@ -51,13 +72,15 @@ while True:
     # cv2.imshow('dis', diff)
 
     if sth:
+        t = time.strftime("%Y%m%d-%H%M%S")
+        print('get something!({})'.format(t))
         writer = cv2.VideoWriter(
-                    "{}.avi".format(time.strftime("%Y%m%d-%H%M%S")), 
+                    "{}.avi".format(t), 
                     cv2.VideoWriter_fourcc('M','P','4','2'), 
                     15, 
                     size
                 )
-        count = 60
+        writer_counter = 120
         background = None
         continue
 
@@ -71,4 +94,6 @@ while True:
     background = gray
 
 cap.release()
-cv2.destroyAllWindows()
+# cv2.destroyAllWindows()
+
+print('rec/total: {}/{}'.format(record_frame, total_frame))
