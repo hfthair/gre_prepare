@@ -144,7 +144,7 @@ if __name__ == '__main__':
 
             if i - k >= 26:
                 t = words_unrecognize[:]
-                pick = len(t)//5+12
+                pick = len(t)//5+5
                 k = i
                 random.shuffle(t)
                 review_in_process = t[:pick]
@@ -180,6 +180,22 @@ if __name__ == '__main__':
                     inin = input(':')
 
         print('\n'.join(i.title for i in words_unrecognize))
+
+    def test(idx):
+        s = getList(idx)
+        random.shuffle(s)
+        i = 0
+        while True:
+            x = s[i:i+10]
+            if not x:
+                break
+            x = [(j.title + ' ' * 18, ' | '.join(j.brief.splitlines())) for j in x]
+            x = [Fore.GREEN+a[:18]+Fore.RESET+b for a, b in x]
+            print('\n'.join(x))
+            inin = input()
+            if inin == 'q':
+                break
+            i += 10
 
     import fire
     fire.Fire(main)
