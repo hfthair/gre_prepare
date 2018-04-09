@@ -47,6 +47,12 @@ if __name__ == '__main__':
 
     init(autoreset=True)
 
+    def partial_match_print(c):
+        m = (i for i in tempDic if c in i)
+        ms = ((i + ' ' * 18, ' | '.join(tempDic[i].brief.splitlines())) for i in m)
+        pr = [Fore.GREEN+a[:18]+Fore.RESET+b for a, b in ms]
+        print('\n'.join(pr))
+
     def getList(i):
         temp = []
         import pandas as pd
@@ -168,6 +174,9 @@ if __name__ == '__main__':
             inin = input()
             if inin == 'q':
                 break
+            if inin.startswith('*'):
+                partial_match_print(inin.replace('*', ''))
+                continue
             if inin:
                 if w not in words_unrecognize:
                     words_unrecognize.append(w)
