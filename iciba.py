@@ -1,4 +1,5 @@
 import requests
+import json
 from bs4 import BeautifulSoup
 
 def search(word):
@@ -56,6 +57,23 @@ def search(word):
 
     return menu, colins[:-1] if colins else ''
 
+def suggests(p, cnt=10):
+    url = 'http://dict-mobile.iciba.com/interface/index.php?c=word&m=getsuggest&nums={}&timestamp=1&client=6&is_need_mean=1&word={}&_=12'
+    c = requests.get(url.format(cnt, p), timeout=0.8)
+    j = json.loads(c.text)
+    if j['status'] != 1:
+        raise Exception('website status wrong!')
+    def means2str(m):
+        return '\n'.join(i['part'] + ' ' + ', '.join(i['means']) for i in m)
+
+    tmp = {msg['key']: means2str(msg['means']) for msg in j['message']}
+    return tmp
+
+
 if __name__ == '__main__':
-    a, b = search('novice')
-    print(a)
+    # a, b = search('novice')
+    # print(a)
+    x = suggests('dis', 3)
+    for i in x:
+        print(i)
+        print(x[i])
