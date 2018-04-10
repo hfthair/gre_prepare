@@ -1,4 +1,5 @@
 from yaoniming3000 import tempDic
+from iciba import suggests
 from colorama import init, Fore, Style
 
 init(autoreset=True)
@@ -16,3 +17,12 @@ while True:
         break
     if inin.strip():
         partial_match_print(inin.strip())
+        print('==========')
+        try:
+            m = suggests(inin.strip(), 5)
+            ms = ((i + ' ' * 18, ' | '.join(m[i].splitlines())) for i in m)
+            pr = [Fore.GREEN+a[:18]+Fore.RESET+b[:55] for a, b in ms]
+            print('\n'.join(pr))
+        except:
+            print('net fail!')
+            pass
