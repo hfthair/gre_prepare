@@ -1,41 +1,65 @@
 import attr
+import os
+import pickle
 
 @attr.s
 class Word(object):
     title = attr.ib()
     brief = attr.ib()
     full = attr.ib()
+    position = attr.ib(default=0)
 
+enable_pickle = False
 
 # todo: save to db
-tempDic = {}
-tempArray = []
+wordByTitle = {}
+wordByList = {}
+wordArrayAll = []
 
-def process(src):
-    lines = src.splitlines()
-    title, pron = lines[0].split('  ')
-    def get_briefs(line):
-        t = line.split('：')[0].strip()
-        t = t[t.index(' '):].strip()
-        return t
+if os.path.exists('gre3000/yaoniming3000.pickle') and enable_pickle:
+    with open('gre3000/yaoniming3000.pickle', 'rb') as f:
+        wordByTitle, wordArrayAll, wordByList = pickle.load(f)
+else:
+    def process(src):
+        lines = src.splitlines()
+        title, pron = lines[0].split('  ')
+        def get_briefs(line):
+            t = line.split('：')[0].strip()
+            t = t[t.index(' '):].strip()
+            return t
 
-    brief = '\n'.join(get_briefs(i) for i in lines[1:] if i.startswith(' ♠'))
-    return Word(title, brief, src)
+        brief = '\n'.join(get_briefs(i) for i in lines[1:] if i.startswith(' ♠'))
+        return Word(title, brief, src)
 
-with open('gre3000/source_from_github.txt', encoding='utf8') as f:
-    c = f.read()
-    sp = (i.strip().replace('A: ', ' ') for i in c.split('Q:') if i.strip())
-    tps = (process(i) for i in sp)
-    for i in tps:
-        tempArray.append(i)
-        if i.title in tempDic:
-            print('!!!!! dupulicated in source --> ' + i.title)
-        tempDic[i.title] = i
+    with open('gre3000/source_from_github.txt', encoding='utf8') as f:
+        c = f.read()
+        sp = (i.strip().replace('A: ', ' ') for i in c.split('Q:') if i.strip())
+        tps = (process(i) for i in sp)
+        for i in tps:
+            wordArrayAll.append(i)
+            if i.title in wordByTitle:
+                print('!!!!! dupulicated in source --> ' + i.title)
+            wordByTitle[i.title] = i
 
+    if enable_pickle:
+        import pandas as pd
+        for i in range(1, 32):
+            wordByList[i] = []
+            sheet = pd.read_excel('gre3000/GRE3000.xlsx', 'L' + str(i), header=None)
+            l = sheet[0].values.tolist()
+            for w in l:
+                if w not in wordByTitle:
+                    print('missing ---> |{}| in list{}({})'.format(w, i, l.index(w)+1))
+                    continue
+                wordByTitle[w].position = i
+                wordByList[i].append(wordByTitle[w])
+
+        with open('gre3000/yaoniming3000.pickle', 'wb') as f:
+            pickle.dump((wordByTitle, wordArrayAll, wordByList), f)
 
 def search(w):
-    if w in tempDic:
-        return tempDic[w]
+    if w in wordByTitle:
+        return wordByTitle[w]
 
 # todo: file structure
 if __name__ == '__main__':
@@ -49,8 +73,8 @@ if __name__ == '__main__':
     init(autoreset=True)
 
     def partial_match_print(c):
-        m = (i for i in tempDic if c in i)
-        ms = ((i + ' ' * 18, ' | '.join(tempDic[i].brief.splitlines())) for i in m)
+        m = (i for i in wordByTitle if c in i)
+        ms = ((i + ' ' * 18, ' | '.join(wordByTitle[i].brief.splitlines())) for i in m)
         pr = [Fore.GREEN+a[:18]+Fore.RESET+b for a, b in ms]
         print('\n'.join(pr))
 
@@ -60,10 +84,10 @@ if __name__ == '__main__':
         sheet = pd.read_excel('gre3000/GRE3000.xlsx', 'L' + str(i), header=None)
         l = sheet[0].values.tolist()
         print('L{} ---> {}'.format(i, len(l)))
-        # temp = [tempDic[w] for w in l]
+        # temp = [wordByTitle[w] for w in l]
         for w in l:
-            if w in tempDic:
-                temp.append(tempDic[w])
+            if w in wordByTitle:
+                temp.append(wordByTitle[w])
             else:
                 print('  ', l.index(w)+1, w)
         return temp
@@ -102,12 +126,12 @@ if __name__ == '__main__':
                 try:
                     l = int(l)
                 except:
-                    left = tempArray.index(tempDic[l])
+                    left = wordArrayAll.index(wordByTitle[l])
 
                 try:
                     r = int(r)
                 except:
-                    right = tempArray.index(tempDic[r])
+                    right = wordArrayAll.index(wordByTitle[r])
 
                 if not right and not left:
                     left, right = l, r
@@ -116,7 +140,7 @@ if __name__ == '__main__':
                 elif not left:
                     left = right - r
 
-                s = tempArray[left:right]
+                s = wordArrayAll[left:right]
         else:
             left = int(rang.lower().replace('list', ''))
             s = getList(left)
@@ -126,7 +150,7 @@ if __name__ == '__main__':
             if sel and sel > 0:
                 s = s[:sel+1]
             if addition:
-                tt = (tempDic[w.title] for w in Word.ran(len(s)//20+5) if w.title in tempDic)
+                tt = (wordByTitle[w.title] for w in Word.ran(len(s)//20+5) if w.title in wordByTitle)
                 s.extend(tt)
                 random.shuffle(s)
 
