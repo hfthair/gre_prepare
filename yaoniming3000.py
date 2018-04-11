@@ -193,9 +193,11 @@ if __name__ == '__main__':
             time_tmp = int(time_deadline - time.time())//60
             if time_left != time_tmp:
                 time_left = time_tmp
-                print(' '*20 +
-                    Fore.YELLOW if time_left>=0 else Fore.RED +
-                    '# {} minutes left.'.format(time_left))
+                time_warning = '    ||| {} minutes left.'.format(time_left)
+                if time_left > 0:
+                    print(Fore.YELLOW + time_warning)
+                else:
+                    print(Fore.RED + time_warning)
 
         print('\n'.join(i.title for i in words_unrecognize))
 
