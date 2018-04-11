@@ -42,6 +42,7 @@ if __name__ == '__main__':
 
     import sys
     import random
+    import time
     from colorama import init, Fore, Style
     from model import Word, save
 
@@ -132,6 +133,8 @@ if __name__ == '__main__':
         count = len(s)
         print('========= {} ========='.format(count))
 
+        time_left = 15
+        time_deadline = 60 * time_left + time.time()
         i = 0
         k = i
         words_unrecognize = []
@@ -185,8 +188,14 @@ if __name__ == '__main__':
                 if sav:
                     save(Word, w.title, w.brief, w.full)
                 inin = input(':' if verify else '')
-                while verify and inin != w.title:
+                while verify and inin != w.title and inin != "'":
                     inin = input(':')
+            time_tmp = int(time_deadline - time.time())//60
+            if time_left != time_tmp:
+                time_left = time_tmp
+                print(' '*20 +
+                    Fore.YELLOW if time_left>=0 else Fore.RED +
+                    '# {} minutes left.'.format(time_left))
 
         print('\n'.join(i.title for i in words_unrecognize))
 
