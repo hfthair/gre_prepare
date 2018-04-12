@@ -23,8 +23,10 @@ while True:
         try:
             m = suggests(inin.strip(), 5)
             ms = ((i + ' ' * 18, ' | '.join(m[i].splitlines())) for i in m)
-            pr = [Fore.GREEN+a[:18]+Fore.RESET+b[:55] for a, b, c in ms]
+            pr = [Fore.GREEN+a[:18]+Fore.RESET+b[:55] for a, b in ms]
             print('\n'.join(pr))
         except:
+            import traceback
+            traceback.print_exc()
             print('net fail!')
             pass

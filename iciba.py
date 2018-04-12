@@ -58,6 +58,7 @@ def search(word):
     return menu, colins[:-1] if colins else ''
 
 def suggests(p, cnt=10):
+    p = '%20'.join(w for w in p.strip().split(' ') if w)
     url = 'http://dict-mobile.iciba.com/interface/index.php?c=word&m=getsuggest&nums={}&timestamp=1&client=6&is_need_mean=1&word={}&_=12'
     c = requests.get(url.format(cnt, p), timeout=0.8)
     j = json.loads(c.text)
