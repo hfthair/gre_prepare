@@ -1,15 +1,8 @@
-import attr
 import os
 import pickle
+from yaoniming3000_word import Word
 
-@attr.s
-class Word(object):
-    title = attr.ib()
-    brief = attr.ib()
-    full = attr.ib()
-    position = attr.ib(default=0)
-
-enable_pickle = False
+enable_pickle = True
 
 # todo: save to db
 wordByTitle = {}
@@ -79,6 +72,7 @@ if __name__ == '__main__':
         print('\n'.join(pr))
 
     def getList(i):
+        # todo: change this when xlsx are all reviewed
         temp = []
         import pandas as pd
         sheet = pd.read_excel('gre3000/GRE3000.xlsx', 'L' + str(i), header=None)
@@ -188,7 +182,8 @@ if __name__ == '__main__':
                 review_in_process = review_in_process[:-1]
             else:
                 i += 1
-            print(str(i) + '. ' + Fore.GREEN + w.title, end='')
+            print(str(i) + '. ' + Fore.GREEN + w.title +
+                    Fore.RESET + '    ({})'.format(w.position), end='')
             inin = input()
             if inin == 'q':
                 break
