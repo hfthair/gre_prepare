@@ -26,7 +26,7 @@ while True:
             pr = [Fore.GREEN+a[:18]+Fore.RESET+b[:55] for a, b in ms]
             print('\n'.join(pr))
         except:
-            import traceback
-            traceback.print_exc()
+            # import traceback
+            # traceback.print_exc()
             print('net fail!')
             pass
