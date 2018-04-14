@@ -2,14 +2,12 @@ import os
 import pickle
 from yaoniming3000_word import Word
 
-enable_pickle = True
-
 # todo: save to db
 wordByTitle = {}
 wordByList = {}
 wordArrayAll = []
 
-if os.path.exists('gre3000/yaoniming3000.pickle') and enable_pickle:
+if os.path.exists('gre3000/yaoniming3000.pickle'):
     with open('gre3000/yaoniming3000.pickle', 'rb') as f:
         wordByTitle, wordArrayAll, wordByList = pickle.load(f)
 else:
@@ -34,21 +32,20 @@ else:
                 print('!!!!! dupulicated in source --> ' + i.title)
             wordByTitle[i.title] = i
 
-    if enable_pickle:
-        import pandas as pd
-        for i in range(1, 32):
-            wordByList[i] = []
-            sheet = pd.read_excel('gre3000/GRE3000.xlsx', 'L' + str(i), header=None)
-            l = sheet[0].values.tolist()
-            for w in l:
-                if w not in wordByTitle:
-                    print('missing ---> |{}| in list{}({})'.format(w, i, l.index(w)+1))
-                    continue
-                wordByTitle[w].position = i
-                wordByList[i].append(wordByTitle[w])
+    import pandas as pd
+    for i in range(1, 32):
+        wordByList[i] = []
+        sheet = pd.read_excel('gre3000/GRE3000.xlsx', 'L' + str(i), header=None)
+        l = sheet[0].values.tolist()
+        for w in l:
+            if w not in wordByTitle:
+                print('missing ---> |{}| in list{}({})'.format(w, i, l.index(w)+1))
+                continue
+            wordByTitle[w].position = i
+            wordByList[i].append(wordByTitle[w])
 
-        with open('gre3000/yaoniming3000.pickle', 'wb') as f:
-            pickle.dump((wordByTitle, wordArrayAll, wordByList), f)
+    with open('gre3000/yaoniming3000.pickle', 'wb') as f:
+        pickle.dump((wordByTitle, wordArrayAll, wordByList), f)
 
 def search(w):
     if w in wordByTitle:
@@ -72,18 +69,7 @@ if __name__ == '__main__':
         print('\n'.join(pr))
 
     def getList(i):
-        # todo: change this when xlsx are all reviewed
-        temp = []
-        import pandas as pd
-        sheet = pd.read_excel('gre3000/GRE3000.xlsx', 'L' + str(i), header=None)
-        l = sheet[0].values.tolist()
-        print('L{} ---> {}'.format(i, len(l)))
-        # temp = [wordByTitle[w] for w in l]
-        for w in l:
-            if w in wordByTitle:
-                temp.append(wordByTitle[w])
-            else:
-                print('  ', l.index(w)+1, w)
+        temp = wordByList[i]
         return temp
 
     def main(rang, args='', sel=0):
