@@ -35,6 +35,9 @@ def create_word(src):
             mean.derive = ''
             means.append(mean)
         elif line.startswith(' ♣近'):
+            if mean.synonym != '':
+                # some error of source
+                continue
             mean.synonym = line.replace(' ♣近', '').strip()
         elif line.startswith(' ♣例'):
             mean.eg = line.replace(' ♣例', '').strip()

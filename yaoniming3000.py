@@ -11,17 +11,6 @@ if os.path.exists('gre3000/yaoniming3000.pickle'):
     with open('gre3000/yaoniming3000.pickle', 'rb') as f:
         wordByTitle, wordArrayAll, wordByList = pickle.load(f)
 else:
-    def process(src):
-        lines = src.splitlines()
-        title, pron = lines[0].split('  ')
-        def get_briefs(line):
-            t = line.split('：')[0].strip()
-            t = t[t.index(' '):].strip()
-            return t
-
-        brief = '\n'.join(get_briefs(i) for i in lines[1:] if i.startswith(' ♠'))
-        return Word(title, brief, src)
-
     with open('gre3000/source_from_github.txt', encoding='utf8') as f:
         c = f.read()
         sp = (i.strip().replace('A: ', ' ') for i in c.split('Q:') if i.strip())
@@ -181,7 +170,7 @@ if __name__ == '__main__':
             for m in w.means:
                 print('  ' + m.cn)
                 if m.synonym:
-                    print(Fore.YELLOW + '    ' + m.synonym)
+                    print('   ' + m.synonym)
 
             inin = input()
             if inin == 'q':
