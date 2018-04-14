@@ -33,6 +33,10 @@ else:
             wordByTitle[w].position = i
             wordByList[i].append(wordByTitle[w])
 
+    for i in wordArrayAll:
+        if i.position == 0:
+            wordByList[31].append(i)
+
     with open('gre3000/yaoniming3000.pickle', 'wb') as f:
         pickle.dump((wordByTitle, wordArrayAll, wordByList), f)
 

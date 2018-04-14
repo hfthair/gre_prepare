@@ -1,11 +1,12 @@
 
 import attr
 
-
+@attr.s
 class Mean(object):
-    cn = attr.ib()
-    en = attr.ib()
+    cn = attr.ib(default='')
+    en = attr.ib(default='')
     synonym = attr.ib(default='')
+    antonym = attr.ib(default='')
     derive = attr.ib(default='')
     eg = attr.ib(default='')
 
@@ -30,15 +31,19 @@ def create_word(src):
             cn = line.split('：')[0].strip()
             mean.cn = cn[cn.index(' '):].strip()
             mean.en = line.replace(cn, '').strip()
-            mean.synonym = ''
-            mean.eg = ''
-            mean.derive = ''
+            # mean.synonym = ''
+            # mean.antonym = ''
+            # mean.eg = ''
+            # mean.derive = ''
             means.append(mean)
         elif line.startswith(' ♣近'):
             if mean.synonym != '':
                 # some error of source
+                mean.antonym = line.replace(' ♣近', '').strip()
                 continue
             mean.synonym = line.replace(' ♣近', '').strip()
+        elif line.startswith(' ♣反'):
+            mean.synonym = line.replace(' ♣反', '').strip()
         elif line.startswith(' ♣例'):
             mean.eg = line.replace(' ♣例', '').strip()
         elif line.startswith(' ♣派'):
