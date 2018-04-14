@@ -1,6 +1,6 @@
 import os
 import pickle
-from yaoniming3000_word import Word
+from yaoniming3000_word import Word, create_word
 
 # todo: save to db
 wordByTitle = {}
@@ -25,7 +25,7 @@ else:
     with open('gre3000/source_from_github.txt', encoding='utf8') as f:
         c = f.read()
         sp = (i.strip().replace('A: ', ' ') for i in c.split('Q:') if i.strip())
-        tps = (process(i) for i in sp)
+        tps = (create_word(i) for i in sp)
         for i in tps:
             wordArrayAll.append(i)
             if i.title in wordByTitle:
@@ -128,7 +128,7 @@ if __name__ == '__main__':
         if rand:
             random.shuffle(s)
             if sel and sel > 0:
-                s = s[:sel+1]
+                s = s[:sel]
             if addition:
                 tt = (wordByTitle[w.title] for w in Word.ran(len(s)//20+5) if w.title in wordByTitle)
                 s.extend(tt)
@@ -177,7 +177,11 @@ if __name__ == '__main__':
                 i -= 2
                 continue
 
-            print('  ' + '\n  '.join(w.brief.splitlines()))
+            # print('  ' + '\n  '.join(w.brief.splitlines()))
+            for m in w.means:
+                print('  ' + m.cn)
+                if m.synonym:
+                    print(Fore.YELLOW + '    ' + m.synonym)
 
             inin = input()
             if inin == 'q':
