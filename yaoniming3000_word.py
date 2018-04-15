@@ -43,7 +43,7 @@ def create_word(src):
                 continue
             mean.synonym = line.replace(' ♣近', '').strip()
         elif line.startswith(' ♣反'):
-            mean.synonym = line.replace(' ♣反', '').strip()
+            mean.antonym = line.replace(' ♣反', '').strip()
         elif line.startswith(' ♣例'):
             mean.eg = line.replace(' ♣例', '').strip()
         elif line.startswith(' ♣派'):
