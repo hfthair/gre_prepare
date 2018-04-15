@@ -51,7 +51,7 @@ if __name__ == '__main__':
     import random
     import time
     from colorama import init, Fore, Style
-    from model import Word, save
+    from model1 import Word
 
     init(autoreset=True)
 
@@ -68,19 +68,19 @@ if __name__ == '__main__':
     def main(rang, args='', sel=0):
         rang = str(rang)
         s = None
-        rand = False
-        sav = False
-        verify = False
-        addition = False
+        arg_rand_order = False
+        arg_save_res = False
+        arg_verify_input = False
+        arg_addition_words = False
 
         if 'r' in args:
-            rand = True
+            arg_rand_order = True
         if 's' in args:
-            sav = True
+            arg_save_res = True
         if 'v' in args:
-            verify = True
+            arg_verify_input = True
         if 'a' in args:
-            addition = True
+            arg_addition_words = True
 
         if ':' in rang:
             l, r = rang.split(':')
@@ -118,11 +118,11 @@ if __name__ == '__main__':
             left = int(rang.lower().replace('list', ''))
             s = getList(left)
 
-        if rand:
+        if arg_rand_order:
             random.shuffle(s)
             if sel and sel > 0:
                 s = s[:sel]
-            if addition:
+            if arg_addition_words:
                 tt = (wordByTitle[w.title] for w in Word.ran(len(s)//20+5) if w.title in wordByTitle)
                 s.extend(tt)
                 random.shuffle(s)
@@ -140,7 +140,7 @@ if __name__ == '__main__':
             if i >= len(s):
                 if len(words_unrecognize) > 0:
                     s = words_unrecognize
-                    if rand:
+                    if arg_rand_order:
                         random.shuffle(s)
                     words_unrecognize = []
                     print('========= re0: {}/{} ========='.format(len(s), count))
@@ -187,11 +187,14 @@ if __name__ == '__main__':
                     words_unrecognize.append(w)
                 print(Fore.YELLOW + ' ' + w.full)
                 print()
-                if sav:
-                    save(Word, w.title, w.brief, w.full)
-                inin = input(':' if verify else '')
-                while verify and inin != w.title and inin != "'":
+                if arg_save_res:
+                    Word.increase(w.title)
+                inin = input(':' if arg_verify_input else '')
+                while arg_verify_input and inin != w.title and inin != "'":
                     inin = input(':')
+            else:
+                Word.descrease(w.title)
+
             time_tmp = int(time_deadline - time.time())//60
             if time_left != time_tmp:
                 time_left = time_tmp
