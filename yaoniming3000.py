@@ -72,6 +72,7 @@ if __name__ == '__main__':
         arg_save_res = False
         arg_verify_input = False
         arg_addition_words = False
+        arg_show_eg = False
 
         if 'r' in args:
             arg_rand_order = True
@@ -81,6 +82,8 @@ if __name__ == '__main__':
             arg_verify_input = True
         if 'a' in args:
             arg_addition_words = True
+        if 'e' in args:
+            arg_show_eg = True
 
         if ':' in rang:
             l, r = rang.split(':')
@@ -161,8 +164,18 @@ if __name__ == '__main__':
                 review_in_process = review_in_process[:-1]
             else:
                 i += 1
-            print(str(i) + '. ' + Fore.GREEN + w.title +
+
+            question = w.title
+            if arg_show_eg:
+                pass
+                # egs = '\n'.join(mean.eg for mean in w.means)
+                # question = ''.join(c if ord(c)<128 else '\n' for c in egs)
+                # question = '\n'.join(q for q in question.splitlines() if q and len(q)>6)
+                # question = question.replace(w.title, Fore.RED + w.title + Fore.GREEN)
+                # question = '\n' + question + '\n'
+            print(str(i) + '. ' + Fore.GREEN + question +
                     Fore.RESET + '    ({})'.format(w.position), end='')
+
             inin = input()
             if inin == 'q':
                 break

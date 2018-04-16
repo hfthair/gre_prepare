@@ -35,5 +35,13 @@ else:
 
 
 if __name__ == '__main__':
-    # print('\n'.join(substrs[keys[0]]))
-    print('\n'.join(keys))
+    from colorama import init, Fore, Style
+    init(autoreset=True)
+    for k in keys:
+        print('============= {} ============'.format(k))
+        input('_')
+        for w in substrs[k]:
+            wx = w + ' ' * 18
+            ms = ' | '.join(m.cn for m in wordByTitle[w].means)
+            print(Fore.GREEN + wx[:18] + Fore.RESET + ms)
+        input('_')
