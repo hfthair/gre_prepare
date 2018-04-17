@@ -38,15 +38,15 @@ class Word(Model):
             ws[0].save()
 
 
-# def save(title, brief, detail):
-#     finds = Word.select().where(Word.title == title)
-#     if finds:
-#         find = finds[0]
-#         find.count = find.count + 1
-#         find.save()
-#     else:
-#         find = Word(title=title, brief=brief, full=detail)
-#         find.save()
+def save(title, pron, brief, detail):
+    finds = Word.select().where(Word.title == title)
+    if finds:
+        find = finds[0]
+        find.inc()
+        find.save()
+    else:
+        find = Word(title=title, pron=pron, brief=brief, full=detail)
+        find.save()
 
 with db:
     if not Word.table_exists():

@@ -1,7 +1,7 @@
 #encoding=utf-8
 import sys
-from iciba import search
-from model import Read, Word, save
+from iciba import search as search_iciba
+from model2 import Word, save
 from colorama import init, Fore, Style
 from peewee import fn
 from yaoniming3000 import search as gre3000
@@ -20,9 +20,9 @@ def cache_show(withcn):
         for x in cache:
             print(Fore.GREEN + x)
 
-def random_show(T, limit, withcn):
-    if not random_show.res or not  withcn:
-        random_show.res = T.select().order_by((fn.random()*T.count).desc()).limit(limit)
+def random_show(limit, withcn):
+    if not random_show.res or not withcn:
+        random_show.res = Word.ran(limit)
     if withcn:
         for i in random_show.res:
             t = i.title + ' ' * 18
@@ -34,8 +34,15 @@ def random_show(T, limit, withcn):
             print(Fore.GREEN + i.title)
 random_show.res = None
 
+def search(w):
+    finds = Word.select().where(Word.title == w)
+    if finds:
+        find = finds[0]
+        return find.pron, find.brief, find.full
+    else:
+        return search_iciba(w)
+
 def main():
-    T = Read
     init(autoreset=True)
 
     while True:
@@ -52,9 +59,9 @@ def main():
             elif w == 'll':
                 cache_show(True)
             elif w == 'r':
-                random_show(T, 10, False)
+                random_show(10, False)
             elif w == 'rr':
-                random_show(T, 10, True)
+                random_show(10, True)
             continue
 
         try:
@@ -69,7 +76,7 @@ def main():
 
             cache_add(w, brief)
 
-            save(T, w, brief, detail)
+            save(w, pron, brief, detail)
 
         except Exception as e:
             print('')
