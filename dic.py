@@ -36,15 +36,10 @@ random_show.res = None
 
 def main():
     T = Read
-    header = '>>> '
-    if len(sys.argv) > 1 and sys.argv[1] == 'word':
-        T = Word
-        header = '$$$ '
-
     init(autoreset=True)
 
     while True:
-        w = input(header)
+        w = input('>>> ')
         w = ''.join(x for x in w if x.lower()>='a' and x.lower()<='z' or x in ' -')
         if not w:
             continue
