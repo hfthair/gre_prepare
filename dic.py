@@ -57,17 +57,12 @@ def main():
                 random_show(T, 10, True)
             continue
 
-        print(Fore.GREEN + ' ' + w)
-        print('===============' * 4)
         try:
-            brief = None
-            detail = None
-            ret = gre3000(w)
-            if ret:
-                brief, detail = ret.brief, ret.full
-            else:
-                brief, detail = search(w)
+            print(Fore.GREEN + '\n ' + w, end='')
+            pron, brief, detail = search(w)
+            print(pron)
 
+            print('===============' * 4)
             print(Fore.GREEN + brief)
             print('===============' * 4)
             print(Fore.YELLOW + detail)
@@ -77,8 +72,17 @@ def main():
             save(T, w, brief, detail)
 
         except Exception as e:
+            print('')
+            print('===============' * 4)
             print(Fore.RED + str(e))
         print('===============' * 4)
+
+        ret = gre3000(w)
+        if ret:
+            _, g3 = ret.brief, ret.full
+            print(Fore.RED + g3)
+            print('===============' * 4)
+
         print('')
 
 if __name__ == '__main__':

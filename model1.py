@@ -125,6 +125,9 @@ if __name__ == '__main__':
     from model import Word as OW
     from yaoniming3000 import wordByTitle
 
+    import sys
+    sys.exit(1)
+
     Word.drop_table()
     Word.create_table()
 

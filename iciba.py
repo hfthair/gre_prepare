@@ -8,6 +8,7 @@ def search(word):
     s = BeautifulSoup(c.text, "lxml")
 
     menu = None
+    pron = None
     base = s.find(class_='in-base')
     if base:
         base_list = base.find(class_='base-list')
@@ -17,12 +18,12 @@ def search(word):
             menu = '\n'.join(lines)
             speak = base.find(class_='base-speak')
             if speak:
-                sp = speak.find_all('span')
-                if sp and len(sp) >= 4:
-                    pron = sp[3].get_text().strip()
-                    if pron.startswith('美'):
-                        pron = pron.replace('美', '').strip()
-                        menu = ' ' + pron + '\n' + menu
+                pron = ' '.join(speak.get_text().splitlines())
+                # sp = speak.find_all('span')
+                # if sp and len(sp) >= 4:
+                #     pron = sp[3].get_text().strip()
+                #     if pron.startswith('美'):
+                #         pron = pron.replace('美', '').strip()
         else:
             trans = base.find_all(class_='clearfix')
             lines = (i.get_text().replace('\n', ' ').replace('\r', '') for i in trans)
@@ -61,9 +62,14 @@ def search(word):
                         colins += ti
                         colins += egs + '\n'
                         colins += '\n'
+                    colins = colins.strip()
                 break
+    if not pron:
+        pron = ''
+    if not colins or len(colins) < 5:
+        colins = ''
 
-    return menu, colins[:-1] if colins else ''
+    return pron, menu, colins
 
 def suggests(p, cnt=10):
     p = '%20'.join(w for w in p.strip().split(' ') if w)
