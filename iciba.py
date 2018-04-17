@@ -15,6 +15,14 @@ def search(word):
             trans = base_list.find_all(class_='clearfix')
             lines = (i.get_text().replace('\n', ' ').replace('\r', '') for i in trans)
             menu = '\n'.join(lines)
+            speak = base.find(class_='base-speak')
+            if speak:
+                sp = speak.find_all('span')
+                if sp and len(sp) >= 4:
+                    pron = sp[3].get_text().strip()
+                    if pron.startswith('美'):
+                        pron = pron.replace('美', '').strip()
+                        menu = ' ' + pron + '\n' + menu
         else:
             trans = base.find_all(class_='clearfix')
             lines = (i.get_text().replace('\n', ' ').replace('\r', '') for i in trans)
