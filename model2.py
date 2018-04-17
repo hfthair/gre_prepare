@@ -37,6 +37,17 @@ class Word(Model):
             ws[0].dsc()
             ws[0].save()
 
+
+# def save(title, brief, detail):
+#     finds = Word.select().where(Word.title == title)
+#     if finds:
+#         find = finds[0]
+#         find.count = find.count + 1
+#         find.save()
+#     else:
+#         find = Word(title=title, brief=brief, full=detail)
+#         find.save()
+
 with db:
     if not Word.table_exists():
         Word.create_table(True)
@@ -51,33 +62,45 @@ if __name__ == '__main__':
     Word.drop_table()
     Word.create_table()
 
-    c = 1
-    for ow in OW.select():
-        title = ow.title
-        cnt = ow.count
-
-        pron = ''
-        brief = ''
-        full = ''
-        tc = 5
-        while not brief and tc > 0:
-            try:
-                pron, brief, full = search(title)
-            except:
+    def migrate(ll):
+        print('start... {}'.format(len(ll)))
+        c = 1
+        crashed = []
+        for title, cnt in ll:
+            pron = ''
+            brief = ''
+            full = ''
+            tc = 5
+            while not brief and tc > 0:
+                try:
+                    pron, brief, full = search(title)
+                except:
+                    pass
+                if not brief:
+                    time.sleep(0.7)
+                tc = tc - 1
+            if tc <= 0:
                 print('\n... fail --> ' + title)
-            if not brief:
-                time.sleep(0.7)
-            tc = tc - 1
+                crashed.append((title, cnt))
+                continue
 
-        ws = Word.select().where(Word.title==title)
-        if ws:
-            print('=== !!!{} duplicated'.format(title))
-            w = ws[0]
-            w.count += cnt
-        else:
-            w = Word(title=title, count=cnt, pron=pron, brief=brief, full=full)
-        print('\r=== {} of {} saved            '.format(c ,title), end='')
-        w.save()
-        time.sleep(0.3)
-        c = c + 1
+            ws = Word.select().where(Word.title==title)
+            if ws:
+                print('=== !!!{} duplicated'.format(title))
+                w = ws[0]
+                w.count += cnt
+            else:
+                w = Word(title=title, count=cnt, pron=pron, brief=brief, full=full)
+            print('\r=== {} of {} saved            '.format(c ,title), end='')
+            w.save()
+            time.sleep(0.1)
+            c = c + 1
+        print('left... {}'.format(len(crashed)))
+        return crashed
+
+
+    ll = [(ow.title, ow.count) for ow in OW.select()]
+
+    while len(ll) > 0:
+        ll = migrate(ll)
 
