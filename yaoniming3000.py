@@ -44,9 +44,21 @@ def search(w):
     if w in wordByTitle:
         return wordByTitle[w]
 
-# todo: file structure
-if __name__ == '__main__':
 
+def synonym_in_3000(w):
+    res = []
+    for m in w.means:
+        s = m.synonym
+        s = ''.join(i for i in s if ord(i) < 128)
+        s = s.replace(',', ' ')
+        l = [i.strip() for i in s.split(' ') if i.strip()]
+        res.extend(l)
+    res = set(res)
+    res = [i for i in res if i in wordByTitle]
+    return res
+
+
+if __name__ == '__main__':
     import sys
     import random
     import time
@@ -73,6 +85,7 @@ if __name__ == '__main__':
         arg_verify_input = False
         arg_addition_words = False
         arg_show_eg = False
+        arg_syn_on = False
 
         if 'r' in args:
             arg_rand_order = True
@@ -84,6 +97,8 @@ if __name__ == '__main__':
             arg_addition_words = True
         if 'e' in args:
             arg_show_eg = True
+        if 'f' in args:
+            arg_syn_on = True
 
         if ':' in rang:
             l, r = rang.split(':')
@@ -129,6 +144,18 @@ if __name__ == '__main__':
                 tt = (wordByTitle[w.title] for w in Word.ran(len(s)//20+5) if w.title in wordByTitle)
                 s.extend(tt)
                 random.shuffle(s)
+
+        if arg_syn_on:
+            with_syn = []
+            for i in s:
+                with_syn.append(i)
+                ts = synonym_in_3000(i)
+                if ts:
+                    ws = [wordByTitle[x] for x in ts]
+                    ws = [x for x in ws if x not in s]
+                    if ws:
+                        with_syn.extend(ws)
+            s = with_syn
 
         count = len(s)
         print('========= {} ========='.format(count))
