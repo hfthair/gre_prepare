@@ -164,6 +164,7 @@ if __name__ == '__main__':
         time_deadline = 60 * time_left + time.time()
         i = 0
         k = i
+        word_all = []
         words_unrecognize = []
         review_in_process = []
         while True:
@@ -202,6 +203,8 @@ if __name__ == '__main__':
                 # question = '\n' + question + '\n'
             print(str(i) + '. ' + Fore.GREEN + question +
                     Fore.RESET + '    ({})'.format(w.position), end='')
+
+            word_all.append(w)
 
             inin = input()
             if inin == 'q':
@@ -244,7 +247,7 @@ if __name__ == '__main__':
                 else:
                     print(Fore.RED + time_warning)
 
-        print('\n'.join(i.title for i in words_unrecognize))
+        print('\n'.join(i.title for i in word_all))
 
     def test(idx):
         s = getList(idx)
