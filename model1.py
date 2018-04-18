@@ -122,28 +122,5 @@ with db:
 db.connect()
 
 if __name__ == '__main__':
-    from model import Word as OW
-    from yaoniming3000 import wordByTitle
-
     import sys
     sys.exit(1)
-
-    Word.drop_table()
-    Word.create_table()
-
-    for ow in OW.select():
-        title = ow.title
-        cnt = ow.count
-        if title not in wordByTitle:
-            print('=== !!! {} not in 3000'.format(title))
-            continue
-        w = None
-        ws = Word.select().where(Word.title==title)
-        if ws:
-            print('=== !!!{} duplicated'.format(title))
-            w = ws[0]
-            w.count += cnt
-        else:
-            w = Word(title=title, count=cnt, lid=wordByTitle[title].position)
-        print('=== {} of {} saved'.format(title, cnt))
-        w.save()
