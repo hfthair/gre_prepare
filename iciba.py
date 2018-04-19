@@ -12,6 +12,8 @@ def colins_to_brief(c):
                 if '-' in b[1]:
                     idx = b[1].index('-')
                     ty = b[1][:idx]
+                # todo: bug, some time add addional '.'(eg. 'course')
+                # another bug: eg. 'do away with'
                 b = [ty.lower()+'.'] + b[2:]
                 br = ' '.join(b)
                 brs.append(br)
