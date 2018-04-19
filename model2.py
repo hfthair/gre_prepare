@@ -55,53 +55,18 @@ with db:
 db.connect()
 
 if __name__ == '__main__':
-    pass
-    # import time
-    # from model import Word as OW
-    # from iciba import search
 
-    # Word.drop_table()
-    # Word.create_table()
+    def change_brief_to_colins():
+        from iciba import colins_to_brief
+        for w in Word.select():
+            c = w.full
+            if c and len(c) > 3:
+                b = colins_to_brief(c)
+                if b:
+                    print('modify. ' + w.title)
+                    w.brief = b
+                    w.save()
 
-    # def migrate(ll):
-    #     print('start... {}'.format(len(ll)))
-    #     c = 1
-    #     crashed = []
-    #     for title, cnt in ll:
-    #         pron = ''
-    #         brief = ''
-    #         full = ''
-    #         tc = 5
-    #         while not brief and tc > 0:
-    #             try:
-    #                 pron, brief, full = search(title)
-    #             except:
-    #                 pass
-    #             if not brief:
-    #                 time.sleep(0.7)
-    #             tc = tc - 1
-    #         if tc <= 0:
-    #             print('\n... fail --> ' + title)
-    #             crashed.append((title, cnt))
-    #             continue
+    # change_brief_to_colins()
 
-    #         ws = Word.select().where(Word.title==title)
-    #         if ws:
-    #             print('=== !!!{} duplicated'.format(title))
-    #             w = ws[0]
-    #             w.count += cnt
-    #         else:
-    #             w = Word(title=title, count=cnt, pron=pron, brief=brief, full=full)
-    #         print('\r=== {} of {} saved            '.format(c ,title), end='')
-    #         w.save()
-    #         time.sleep(0.1)
-    #         c = c + 1
-    #     print('left... {}'.format(len(crashed)))
-    #     return crashed
-
-
-    # ll = [(ow.title, ow.count) for ow in OW.select()]
-
-    # while len(ll) > 0:
-    #     ll = migrate(ll)
 
