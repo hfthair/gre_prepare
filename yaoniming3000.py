@@ -85,7 +85,7 @@ if __name__ == '__main__':
         arg_verify_input = False
         arg_addition_words = False
         arg_show_eg = False
-        arg_syn_on = False
+        arg_inline = False
 
         if 'r' in args:
             arg_rand_order = True
@@ -97,8 +97,8 @@ if __name__ == '__main__':
             arg_addition_words = True
         if 'e' in args:
             arg_show_eg = True
-        if 'f' in args:
-            arg_syn_on = True
+        if 'l' in args:
+            arg_inline = True
 
         if ':' in rang:
             l, r = rang.split(':')
@@ -145,18 +145,6 @@ if __name__ == '__main__':
                 s.extend(tt)
                 random.shuffle(s)
 
-        if arg_syn_on:
-            with_syn = []
-            for i in s:
-                with_syn.append(i)
-                ts = synonym_in_3000(i)
-                if ts:
-                    ws = [wordByTitle[x] for x in ts]
-                    ws = [x for x in ws if x not in s]
-                    if ws:
-                        with_syn.extend(ws)
-            s = with_syn
-
         count = len(s)
         print('========= {} ========='.format(count))
 
@@ -193,59 +181,69 @@ if __name__ == '__main__':
             else:
                 i += 1
 
-            question = w.title
-            if arg_show_eg:
-                pass
-                # egs = '\n'.join(mean.eg for mean in w.means)
-                # question = ''.join(c if ord(c)<128 else '\n' for c in egs)
-                # question = '\n'.join(q for q in question.splitlines() if q and len(q)>6)
-                # question = question.replace(w.title, Fore.RED + w.title + Fore.GREEN)
-                # question = '\n' + question + '\n'
-            print(str(i) + '. ' + Fore.GREEN + question +
-                    Fore.RESET + '    ({})'.format(w.position), end='')
-
             word_all.append(w)
-
-            inin = input()
-            if inin == 'q':
-                break
-            if inin == 'b' and i > 0:
-                i -= 2
-                continue
-
-            # print('  ' + '\n  '.join(w.brief.splitlines()))
-            for m in w.means:
-                print('  ' + m.cn)
-                if m.synonym:
-                    print('   ' + m.synonym)
-
-            inin = input()
-            if inin == 'q':
-                break
-            if inin.startswith('*'):
-                partial_match_print(inin.replace('*', ''))
-                continue
-            if inin:
-                if w not in words_unrecognize:
-                    words_unrecognize.append(w)
-                print(Fore.YELLOW + ' ' + w.full)
-                print()
-                if arg_save_res:
-                    Word.increase(w.title)
-                inin = input(':' if arg_verify_input else '')
-                while arg_verify_input and inin != w.title and inin != "'":
-                    inin = input(':')
+            if arg_inline:
+                def gen_line(a, b):
+                    t = a + ' ' * 13
+                    t = t[:13]
+                    return Fore.GREEN + t + Fore.RESET + ' | '.join(b.splitlines())
+                print(gen_line(w.title, w.brief), end='')
+                inin = input()
+                if inin == 'q':
+                    break
             else:
-                Word.descrease(w.title)
+                question = w.title
+                if arg_show_eg:
+                    pass
+                    # egs = '\n'.join(mean.eg for mean in w.means)
+                    # question = ''.join(c if ord(c)<128 else '\n' for c in egs)
+                    # question = '\n'.join(q for q in question.splitlines() if q and len(q)>6)
+                    # question = question.replace(w.title, Fore.RED + w.title + Fore.GREEN)
+                    # question = '\n' + question + '\n'
 
-            time_tmp = int(time_deadline - time.time())//60
-            if time_left != time_tmp:
-                time_left = time_tmp
-                time_warning = '    ||| {} minutes left.'.format(time_left)
-                if time_left > 0:
-                    print(Fore.YELLOW + time_warning)
+                print(str(i) + '. ' + Fore.GREEN + question +
+                        Fore.RESET + '    ({})'.format(w.position), end='')
+
+                inin = input()
+                if inin == 'q':
+                    break
+                if inin == 'b' and i > 0:
+                    i -= 2
+                    continue
+
+                # print('  ' + '\n  '.join(w.brief.splitlines()))
+                for m in w.means:
+                    print('  ' + m.cn)
+                    if m.synonym:
+                        print('   ' + m.synonym)
+
+                inin = input()
+                if inin == 'q':
+                    break
+                if inin.startswith('*'):
+                    partial_match_print(inin.replace('*', ''))
+                    continue
+                if inin:
+                    if w not in words_unrecognize:
+                        words_unrecognize.append(w)
+                    print(Fore.YELLOW + ' ' + w.full)
+                    print()
+                    if arg_save_res:
+                        Word.increase(w.title)
+                    inin = input(':' if arg_verify_input else '')
+                    while arg_verify_input and inin != w.title and inin != "'":
+                        inin = input(':')
                 else:
-                    print(Fore.RED + time_warning)
+                    Word.descrease(w.title)
+
+                time_tmp = int(time_deadline - time.time())//60
+                if time_left != time_tmp:
+                    time_left = time_tmp
+                    time_warning = '    ||| {} minutes left.'.format(time_left)
+                    if time_left > 0:
+                        print(Fore.YELLOW + time_warning)
+                    else:
+                        print(Fore.RED + time_warning)
 
         print('\n'.join(i.title for i in word_all))
 
