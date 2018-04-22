@@ -67,6 +67,28 @@ if __name__ == '__main__':
                     w.brief = b
                     w.save()
 
+    def write_csv():
+        import pandas as pd
+        id = []
+        title = []
+        brief = []
+
+        for w in Word.select():
+            id.append(w.id)
+            title.append(w.title)
+            brief.append(w.brief)
+
+        df = pd.DataFrame({'id':id, 'title':title, 'brief':brief})
+
+        writer = pd.ExcelWriter('../read.xlsx')
+        df.to_excel(writer, index=False)
+        writer.save()
+
+    def mprint():
+        for w in Word.select():
+            print('')
+
+    write_csv()
     # change_brief_to_colins()
 
 
