@@ -85,10 +85,22 @@ if __name__ == '__main__':
         writer.save()
 
     def mprint():
-        for w in Word.select():
-            print('')
+        from colorama import init, Fore, Style
+        init()
+        def printw(w):
+            t = w.title + ' ' * 18
+            t = t[:18]
+            print(Fore.GREEN + t + Fore.RESET + ' | '.join(w.brief.splitlines()), end='')
 
-    write_csv()
+        for w in Word.select().order_by(Word.id.desc()):
+            printw(w)
+            q = input()
+            if q == 'q':
+                break
+
+
+    mprint()
+    # write_csv()
     # change_brief_to_colins()
 
 
