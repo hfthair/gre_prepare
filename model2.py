@@ -92,7 +92,7 @@ if __name__ == '__main__':
             t = t[:15]
             print(Fore.GREEN + t + Fore.RESET + ' | '.join(w.brief.splitlines()), end='')
 
-        for w in Word.select().order_by(-Word.count, -Word.id):
+        for w in Word.select().order_by((Word.count * Word.id).desc()):
             printw(w)
             q = input()
             if q == 'q':
