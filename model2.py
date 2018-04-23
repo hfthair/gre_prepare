@@ -88,11 +88,11 @@ if __name__ == '__main__':
         from colorama import init, Fore, Style
         init()
         def printw(w):
-            t = w.title + ' ' * 18
-            t = t[:18]
+            t = w.title + ' ' * 15
+            t = t[:15]
             print(Fore.GREEN + t + Fore.RESET + ' | '.join(w.brief.splitlines()), end='')
 
-        for w in Word.select().order_by(Word.id.desc()):
+        for w in Word.select().order_by(-Word.count, -Word.id):
             printw(w)
             q = input()
             if q == 'q':
