@@ -84,22 +84,27 @@ if __name__ == '__main__':
         df.to_excel(writer, index=False)
         writer.save()
 
-    def mprint():
+    def mprint(lim=0):
         from colorama import init, Fore, Style
         init()
-        def printw(w):
+        def printw(w, cnt):
             t = w.title + ' ' * 15
-            t = t[:15]
+            t = '({}) '.format(cnt) + t[:15]
             print(Fore.GREEN + t + Fore.RESET + ' | '.join(w.brief.splitlines()), end='')
 
-        for w in Word.select().order_by((Word.count * Word.id).desc()):
-            printw(w)
+        cnt = 0
+        for w in Word.select().order_by(((Word.count-0.8) * Word.id).desc(), Word.id.desc()):
+            cnt += 1
+            if cnt < lim:
+                continue
+
+            printw(w, cnt)
             q = input()
             if q == 'q':
                 break
 
-
-    mprint()
+    import fire
+    fire.Fire(mprint)
     # write_csv()
     # change_brief_to_colins()
 
