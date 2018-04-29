@@ -1,4 +1,6 @@
-from peewee import SqliteDatabase, Model, CharField, IntegerField, FloatField, fn
+import datetime
+from peewee import SqliteDatabase, Model, CharField, IntegerField, \
+    FloatField, DateTimeField, fn
 
 db = SqliteDatabase('verbal_read.db')
 
@@ -8,8 +10,16 @@ class Word(Model):
     pron = CharField(default='')
     brief = CharField(default='')
     full = CharField(default='', max_length=2048)
+    last_modify = DateTimeField(default=datetime.datetime.now)
     class Meta:
         database = db
+
+    def save(self, *args, **kwargs):
+        self.last_modify = datetime.datetime.now()
+        return super(Word, self).save(*args, **kwargs)
+
+    def touch(self):
+        self.save()
 
     def inc(self):
         self.count += 1.0
@@ -56,6 +66,9 @@ db.connect()
 
 if __name__ == '__main__':
 
+    from colorama import init, Fore, Style
+    init()
+
     def change_brief_to_colins():
         from iciba import colins_to_brief
         for w in Word.select():
@@ -84,27 +97,57 @@ if __name__ == '__main__':
         df.to_excel(writer, index=False)
         writer.save()
 
-    def mprint(lim=0):
-        from colorama import init, Fore, Style
-        init()
-        def printw(w, cnt):
-            t = w.title + ' ' * 15
-            t = '({}) '.format(cnt) + t[:15]
-            print(Fore.GREEN + t + Fore.RESET + ' | '.join(w.brief.splitlines()), end='')
+    def printw(w, cnt):
+        t = w.title + ' ' * 15
+        t = '({}) '.format(cnt) + t[:15]
+        print(Fore.GREEN + t + Fore.RESET + ' | '.join(w.brief.splitlines()), end='')
 
+    def get_data_of_day(fr, to):
+        frr = datetime.datetime.combine(fr, datetime.time.min)
+        too = datetime.datetime.combine(fr, datetime.time.max)
+        return Word.select().where(Word.last_modify>frr and Word.last_modify<too)
+
+    def print_ws(ws, touch):
         cnt = 0
-        for w in Word.select().order_by(((Word.count-0.8) * Word.id).desc(), Word.id.desc()):
+        for w in ws:
             cnt += 1
-            if cnt < lim:
-                continue
 
             printw(w, cnt)
             q = input()
+            if touch:
+                w.touch()
             if q == 'q':
                 break
 
+    def task_for_today():
+        ws = get_data_of_day(datetime.date.today(), datetime.date.today())
+
+        if ws.count() > 30:
+            ws = ws.order_by(fn.random())
+            print_ws(ws, False)
+        else:
+            ws = Word.select().where(Word.last_modify==None).limit(65).\
+                order_by(((Word.count-0.8) * Word.id).desc(), Word.id.desc())
+            print_ws(ws, True)
+
+
+    def task_for_review():
+        cr = (1, 2, 3, 5)
+        cr = [datetime.datetime.now().date()-datetime.timedelta(days=i) for i in cr]
+        cr = [(i.year, i.month, i.day) for i in cr]
+        print(cr)
+
+        # not work!!!
+        ws = Word.select().\
+                where(Word.last_modify!=None and \
+                (Word.last_modify.year, Word.last_modify.month, Word.last_modify.day) in cr).\
+                order_by(Word.last_modify.desc(), fn.random())
+
+        print_ws(ws, False)
+
+
     import fire
-    fire.Fire(mprint)
+    fire.Fire({'new': task_for_today, 'review': task_for_review})
     # write_csv()
     # change_brief_to_colins()
 
