@@ -143,19 +143,19 @@ if __name__ == '__main__':
     def task_for_review():
         cr = (1, 2, 3, 5)
         cr = [datetime.datetime.now().date()-datetime.timedelta(days=i) for i in cr]
-        cr = [i.year*10000+i.month*10+i.day for i in cr]
+        cr = [i.year*10000+i.month*100+i.day for i in cr]
 
         # how does peewee support |(col1, col2) << ((a,b), (c,d))| ?
         ws = Word.select().\
-                where(Word.last_modify!=None & \
-                    (Word.last_modify.year*10000+Word.last_modify.month*100+Word.last_modify.day) << cr).\
+                where(~Word.last_modify.is_null()). \
+                where((Word.last_modify.year*10000+Word.last_modify.month*100+Word.last_modify.day) << cr).\
                 order_by(Word.last_modify.desc(), fn.random())
 
         print_ws(ws, False)
 
 
     import fire
-    fire.Fire({'new': task_for_today, 'review': task_for_review})
+    fire.Fire({'today': task_for_today, 'review': task_for_review})
     # write_csv()
     # change_brief_to_colins()
 
