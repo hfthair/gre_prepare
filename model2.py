@@ -141,7 +141,7 @@ if __name__ == '__main__':
 
 
     def task_for_review():
-        cr = (1, 2, 3, 5)
+        cr = (1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 15)
         cr = [datetime.datetime.now().date()-datetime.timedelta(days=i) for i in cr]
         cr = [i.year*10000+i.month*100+i.day for i in cr]
 
@@ -153,9 +153,22 @@ if __name__ == '__main__':
 
         print_ws(ws, False)
 
+    def stop_watch():
+        import time
+        import os
+        os.system('cls')
+        delta = 0
+        def strstr(d):
+            m = d // 60
+            s = d - m * 60
+            return '{:0>2d} : {:0>2d}'.format(m, s)
+        while True:
+            print('\r' + strstr(delta) + '        ', end='')
+            time.sleep(1.0)
+            delta += 1
 
     import fire
-    fire.Fire({'today': task_for_today, 'review': task_for_review})
+    fire.Fire({'today': task_for_today, 'review': task_for_review, 'time': stop_watch})
     # write_csv()
     # change_brief_to_colins()
 
