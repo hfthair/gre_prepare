@@ -1,6 +1,6 @@
 import pickle
 import os
-from yaoniming3000 import wordByTitle
+from . import book
 from difflib import SequenceMatcher as SM
 from itertools import combinations
 
@@ -15,11 +15,15 @@ def common_substr(a, b):
 substrs = {}
 keys = []
 
-if os.path.exists('gre3000/analyze3000.pickle'):
-    with open('gre3000/analyze3000.pickle', 'rb') as f:
+__dir, _ = os.path.split(__file__)
+
+pickle_path = os.path.join(__dir, 'data/analyze3000.pickle')
+
+if os.path.exists(pickle_path):
+    with open(pickle_path, 'rb') as f:
         substrs, keys = pickle.load(f)
 else:
-    all_words = wordByTitle.keys()
+    all_words = book.byTitle.keys()
 
     for i, j in combinations(all_words, 2):
         c = common_substr(i, j)
@@ -30,7 +34,7 @@ else:
             substrs[c].add(j)
 
     keys = sorted(substrs.keys(), key=lambda x: len(x), reverse=True)
-    with open('gre3000/analyze3000.pickle', 'wb') as f:
+    with open(pickle_path, 'wb') as f:
             pickle.dump((substrs, keys), f)
 
 
@@ -42,6 +46,6 @@ if __name__ == '__main__':
         input('_')
         for w in substrs[k]:
             wx = w + ' ' * 18
-            ms = ' | '.join(m.cn for m in wordByTitle[w].means)
+            ms = ' | '.join(m.cn for m in book.byTitle[w].means)
             print(Fore.GREEN + wx[:18] + Fore.RESET + ms)
         input('_')

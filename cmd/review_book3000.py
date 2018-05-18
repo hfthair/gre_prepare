@@ -1,11 +1,11 @@
 import datetime
+import init_path
 from peewee import fn
-from yaoniming3000 import wordByTitle
-from model1 import Word
 from colorama import init, Fore, Style
+from book_v3000 import book
+from book_v3000.model import Word
 
 init()
-
 
 def get_data_of_day(fr, to):
     # frr = datetime.datetime.combine(fr, datetime.time.min)
@@ -28,7 +28,7 @@ def print_ws(ws, touch):
     for w in ws:
         cnt += 1
 
-        printw(wordByTitle[w.title], cnt)
+        printw(book.byTitle[w.title], cnt)
         q = input()
         if touch:
             w.touch()

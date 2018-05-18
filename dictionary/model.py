@@ -1,8 +1,11 @@
+import os
 import datetime
 from peewee import SqliteDatabase, Model, CharField, IntegerField, \
     FloatField, DateTimeField, fn
 
-db = SqliteDatabase('verbal_read.db')
+__dir, _ = os.path.split(__file__)
+
+db = SqliteDatabase(os.path.join(__dir, 'data/verbal_read.db'))
 
 class Word(Model):
     title = CharField(unique=True)

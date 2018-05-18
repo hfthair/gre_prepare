@@ -1,10 +1,11 @@
 #encoding=utf-8
 import sys
-from iciba import search as search_iciba
-from model2 import Word, save
+import init_path
 from colorama import init, Fore, Style
 from peewee import fn
-from yaoniming3000 import search as gre3000
+from dictionary.iciba import search as search_iciba
+from dictionary.model import Word, save
+from book_v3000.book import search as bookv3000
 
 cache = {}
 def cache_add(w, d):
@@ -84,7 +85,7 @@ def main():
             print(Fore.RED + str(e))
         print('===============' * 4)
 
-        ret = gre3000(w)
+        ret = bookv3000(w)
         if ret:
             _, g3 = ret.brief, ret.full
             print(Fore.RED + g3)
