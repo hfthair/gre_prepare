@@ -20,7 +20,6 @@ def colins_to_brief(c):
     if brs:
         return '\n'.join(brs)
 
-
 def search(word):
     word = '%20'.join(w for w in word.strip().split(' ') if w)
     c = requests.get('http://www.iciba.com/' + word, timeout=0.8)

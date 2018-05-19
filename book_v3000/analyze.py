@@ -1,9 +1,8 @@
 import pickle
 import os
-from . import book
 from difflib import SequenceMatcher as SM
 from itertools import combinations
-
+from . import book
 
 def common_substr(a, b):
     sm = SM(None, a, b)

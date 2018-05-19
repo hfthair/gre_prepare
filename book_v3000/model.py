@@ -54,27 +54,3 @@ with db:
 
 db.connect()
 
-# if __name__ == '__main__':
-#     from colorama import init, Fore, Style
-#     from yaoniming3000 import wordByTitle
-
-#     def mprint(iii):
-#         init()
-#         def printw(w):
-#             t = w.title + ' ' * 15
-#             t = t[:15]
-#             ww = wordByTitle[w.title]
-#             print(Fore.GREEN + t + Fore.RESET + ' | '.join(ww.brief.splitlines()), end='')
-
-#         cnt = 0
-#         for w in Word.select().where(Word.lid==iii).order_by(Word.title):
-#             cnt += 1
-#             printw(w)
-#             q = input()
-#             if q == 'q':
-#                 break
-#         print('----- {} ------'.format(cnt))
-
-#     import fire
-#     fire.Fire(mprint)
-
