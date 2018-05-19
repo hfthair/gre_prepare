@@ -62,18 +62,4 @@ def task_for_review():
 
     print_ws(ws, False)
 
-def stop_watch():
-    import time
-    import os
-    os.system('cls')
-    delta = 0
-    def strstr(d):
-        m = d // 60
-        s = d - m * 60
-        return '{:0>2d} : {:0>2d}'.format(m, s)
-    while True:
-        print('\r' + strstr(delta) + '        ', end='')
-        time.sleep(1.0)
-        delta += 1
-
-fire.Fire({'today': task_for_today, 'review': task_for_review, 'time': stop_watch})
+fire.Fire({'today': task_for_today, 'review': task_for_review})
