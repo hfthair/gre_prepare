@@ -91,19 +91,12 @@ class Window:
             print('last retrive error {} || {}'.format(r[0], last))
             return
 
-    def cache_marks(self):
-        iis = self.tv.tag_has('mark')
-        for iid in iis:
-            text = self.tv.item(iid, 'text')
-            self.marks.add(text)
-
     def restore_marks(self):
         for i in self.tv.get_children():
             if self.tv.item(i, 'text') in self.marks:
                 self.tv.item(i, tags=('mark', ))
 
     def update(self, d, ws):
-        self.cache_marks()
         self.tv.delete(*self.tv.get_children())
         self.root.title(str(d))
         first = None
@@ -162,7 +155,13 @@ class Window:
         sels = self.tv.selection()
         if sels:
             iid = sels[0]
-            self.tv.item(iid, tags=('mark', ))
+            text = self.tv.item(iid, 'text')
+            if self.tv.tag_has('mark', iid):
+                self.marks.remove(text)
+                self.tv.item(iid, tags=())
+            else:
+                self.tv.item(iid, tags=('mark', ))
+                self.marks.add(text)
 
     def on_press(self, e):
         key = e.keysym
