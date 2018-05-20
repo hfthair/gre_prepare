@@ -15,77 +15,173 @@ def get_data_of_day(fr, to):
         where(Word.last_modify.month<=to.month).\
         where(Word.last_modify.day<=to.day)
 
-def task_for_today():
-    ws = get_data_of_day(datetime.date.today(), datetime.date.today())
-
-    if ws.count() > 30:
-        print('==== review today ({}) ===='.format(ws.count()))
-        ws = ws.order_by(fn.random())
-        return ws
-    else:
-        print('==== new today ====')
-        ws = Word.select().where(Word.last_modify.is_null()).\
-            order_by(((Word.count-0.8) * Word.id).desc(), Word.id.desc()).\
-            limit(65)
-        return ws
-
-def task_for_review():
-    cr = (1, 2, 3, 5, 6, 7, 8, 9, 10, 12, 15)
-    cr = [datetime.datetime.now().date()-datetime.timedelta(days=i) for i in cr]
-    cr = [i.year*10000+i.month*100+i.day for i in cr]
-
-    # how does peewee support |(col1, col2) << ((a,b), (c,d))| ?
-    ws = Word.select().\
-            where(~Word.last_modify.is_null()). \
-            where((Word.last_modify.year*10000+Word.last_modify.month*100+Word.last_modify.day) << cr).\
-            order_by(Word.last_modify.desc(), fn.random())
-
+def task_from_prehistory():
+    print('==== from prehistory ====')
+    ws = Word.select().where(Word.last_modify.is_null()).\
+        order_by(((Word.count-0.8) * Word.id).desc(), Word.id.desc()).\
+        limit(65)
     return ws
 
+def task_for_review(day):
+    ws = get_data_of_day(day, day)
+    if not ws or ws.count() <= 0:
+        return task_for_review(day-datetime.timedelta(days=1))
 
-root = tkinter.Tk()
-
-ttk.Style().configure('Treeview', rowheight=36)
-tv = ttk.Treeview(root, columns=('brief'))
-tv.heading('#0', text='title')
-tv.heading('#1', text='brief')
-
-w_to_show = task_for_review()
-it = iter(w_to_show)
+    return day, ws
 
 
-def __add(w):
-    br = ' | '.join(w.brief.splitlines())
-    item = tv.insert('', 'end', text=w.title, values=(br,))
-    if item:
-        tv.selection_set(item)
-    return item
+class Window:
+    def __init__(self):
+        self.root = tkinter.Tk()
+        self.root.geometry('860x580')
 
-def add():
-    try:
-        w = it.next()
-        n = __add(w)
-        return n
-    except:
-        print('exception when add.')
-        pass
+        tips = '''keyboard control: { (-> <- ^ v): direction, (space): mark }'''
+        tkinter.Label(self.root, text=tips).grid(row=1, column=0, columnspan=3, padx=5, sticky=tkinter.W)
 
-c = 5
-while c > 0:
-    n = add()
-    if not n:
-        break
-    c -= 1
+        self.btn_l = tkinter.Button(self.root, text='<-', width=8, command=self.show_prev_day)
+        self.btn_r = tkinter.Button(self.root, text='->', width=8, command=self.show_next_day)
+        self.btn_z = tkinter.Button(self.root, text='-z-', width=8, command=self.show_prehistory)
+        self.btn_l.grid(row=1, column=4, pady=8)
+        self.btn_r.grid(row=1, column=5, pady=8)
+        self.btn_z.grid(row=1, column=6, pady=8)
 
-def on_press(e):
-    key = e.keysym
-    if key == 'Return':
-        n = add()
-        if not n:
-            print('nothing')
-        tv.yview_moveto(1)
+        self.detail = tkinter.Text(self.root, height=38, width=46, relief='sunken')
+        self.detail.config(state=tkinter.DISABLED)
+        self.detail.grid(row=0, column=4, columnspan=3, pady=16, padx=3, sticky=tkinter.W)
 
-root.bind('<KeyPress>', on_press)
+        ttk.Style().configure('Treeview', rowheight=26)
+        self.tv = ttk.Treeview(self.root, columns=('brief'), height=18)
+        self.tv.heading('#0', text='title')
+        self.tv.heading('#1', text='brief')
+        self.tv.column('#0', width=100, minwidth=80)
+        self.tv.column('#1', width=400, minwidth=200)
+        self.tv.grid(row=0, column=0, columnspan=3, pady=16, padx=5)
 
-tv.pack()
-root.mainloop()
+        self.tv.tag_configure('mark', background='orange')
+
+        self.root.bind('<Key>', self.on_press)
+        self.tv.bind('<<TreeviewSelect>>', self.on_select)
+
+        self.cur = None
+        self.stack = []
+        self.marks = set()
+
+    def __next(self):
+        d = None
+        if not self.cur:
+            d = datetime.datetime.now().date()
+        else:
+            d = self.cur-datetime.timedelta(days=1)
+        r = task_for_review(d)
+        if r:
+            self.cur, _ = r
+            self.stack.append(self.cur)
+        return r
+
+    def __prev(self):
+        if len(self.stack) < 2:
+            return
+        last = self.stack[-2]
+        r = task_for_review(last)
+        if r and r[0] == last:
+            self.cur, _ = r
+            self.stack = self.stack[:-1]
+            return r
+        else:
+            print('last retrive error {} || {}'.format(r[0], last))
+            return
+
+    def cache_marks(self):
+        iis = self.tv.tag_has('mark')
+        for iid in iis:
+            text = self.tv.item(iid, 'text')
+            self.marks.add(text)
+
+    def restore_marks(self):
+        for i in self.tv.get_children():
+            if self.tv.item(i, 'text') in self.marks:
+                self.tv.item(i, tags=('mark', ))
+
+    def update(self, d, ws):
+        self.cache_marks()
+        self.tv.delete(*self.tv.get_children())
+        self.root.title(str(d))
+        first = None
+        for w in ws:
+            br = ' | '.join(w.brief.splitlines())
+            i = self.tv.insert('', 'end', text=w.title, values=(br,))
+            if not first and i:
+                first = i
+        self.restore_marks()
+        self.tv.focus_set()
+        self.tv.selection_set((first, ))
+        self.tv.focus(first)
+
+    def show_next_day(self):
+        r = self.__next()
+        if r:
+            d, ws = r
+            self.update(d, ws)
+        else:
+            print('no next')
+
+    def show_prev_day(self):
+        r = self.__prev()
+        if r:
+            d, ws = r
+            self.update(d, ws)
+        else:
+            print('no prev')
+
+    def show_prehistory(self):
+        r = task_from_prehistory()
+        if r:
+            d = datetime.datetime.now().date()
+            self.cur = d
+            self.update(d, r)
+        else:
+            print('no prehistory items')
+
+    def update_detail(self):
+        sels = self.tv.selection()
+        if sels:
+            text = self.tv.item(sels[0], 'text')
+            ws = Word.select().where(Word.title==text)
+            if ws:
+                w = ws[0]
+                detail = w.full
+                if not detail:
+                    detail = w.brief
+                # self.detail['text'] = detail
+                self.detail.config(state=tkinter.NORMAL)
+                self.detail.delete(1.0, tkinter.END)
+                self.detail.insert(tkinter.END, detail)
+                self.detail.config(state=tkinter.DISABLED)
+
+    def mark(self):
+        sels = self.tv.selection()
+        if sels:
+            iid = sels[0]
+            self.tv.item(iid, tags=('mark', ))
+
+    def on_press(self, e):
+        key = e.keysym
+        m = {
+            'Right': self.show_next_day,
+            'Left': self.show_prev_day,
+            'space': self.mark
+        }
+
+        if key in m:
+            m[key]()
+
+    def on_select(self, e):
+        self.update_detail()
+
+    def mainloop(self):
+        self.show_next_day()
+        self.root.mainloop()
+
+if __name__ == '__main__':
+    window = Window()
+    window.mainloop()
