@@ -96,13 +96,15 @@ class Window:
             if self.tv.item(i, 'text') in self.marks:
                 self.tv.item(i, tags=('mark', ))
 
-    def update(self, d, ws):
+    def update(self, d, ws, touch=False):
         self.tv.delete(*self.tv.get_children())
         self.root.title(str(d))
         first = None
         for w in ws:
             br = ' | '.join(w.brief.splitlines())
             i = self.tv.insert('', 'end', text=w.title, values=(br,))
+            if touch:
+                w.touch()
             if not first and i:
                 first = i
         self.restore_marks()
@@ -131,7 +133,7 @@ class Window:
         if r:
             d = datetime.datetime.now().date()
             self.cur = d
-            self.update(d, r)
+            self.update(d, r, True)
         else:
             print('no prehistory items')
 
@@ -184,3 +186,5 @@ class Window:
 if __name__ == '__main__':
     window = Window()
     window.mainloop()
+
+    print('\n'.join(window.marks))
