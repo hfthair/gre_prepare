@@ -40,7 +40,7 @@ class Window:
 
         self.btn_l = tkinter.Button(self.root, text='<-', width=8, command=self.show_prev_day)
         self.btn_r = tkinter.Button(self.root, text='->', width=8, command=self.show_next_day)
-        self.btn_z = tkinter.Button(self.root, text='-z-', width=8, command=self.show_prehistory)
+        self.btn_z = tkinter.Button(self.root, text='-z-', width=8, command=self.show_marked)
         self.btn_l.grid(row=1, column=4, pady=8)
         self.btn_r.grid(row=1, column=5, pady=8)
         self.btn_z.grid(row=1, column=6, pady=8)
@@ -126,6 +126,8 @@ class Window:
             d, ws = r
             self.update(d, ws)
         else:
+            if len(self.marks) > 0:
+                self.show_marked()
             print('no prev')
 
     def show_prehistory(self):
@@ -136,6 +138,13 @@ class Window:
             self.update(d, r, True)
         else:
             print('no prehistory items')
+
+    def show_marked(self):
+        r = (Word.get(Word.title == i) for i in self.marks)
+
+        self.cur = None
+        self.stack = []
+        self.update('marked' , r, True)
 
     def update_detail(self):
         sels = self.tv.selection()
