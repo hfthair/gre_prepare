@@ -18,6 +18,11 @@ class Timer:
             self.__t += (time.time() - self.__p)
             self.__p = None
 
+    def reset(self):
+        self.__t = None
+        self.__p = None
+        self.start()
+
     def display(self):
         if not self.__t:
             return
@@ -31,14 +36,15 @@ class Timer:
 timer = Timer()
 
 root = tkinter.Tk()
+root.title('stopwatch')
 
 label = tkinter.Label(root, text="Welcome!", fg="black", font="Verdana 30 bold")
-label.pack()
+label.grid(row=0, column=0, columnspan=4)
 
 btn = tkinter.Button(root, text='pause')
-btn.pack(side=tkinter.BOTTOM)
+btn.grid(row=1, column=1)
 
-def action():
+def pause_or_resume():
     text = btn['text']
     if text == 'pause':
         timer.pause()
@@ -46,7 +52,12 @@ def action():
     else:
         timer.resume()
         btn['text'] = 'pause'
-btn.configure(command=action)
+btn.configure(command=pause_or_resume)
+
+def reset():
+    timer.reset()
+    btn['text'] = 'pause'
+tkinter.Button(root, text='reset', command=reset).grid(row=1, column=2)
 
 root.call('wm', 'attributes', '.', '-topmost', '1')
 

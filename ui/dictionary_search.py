@@ -19,6 +19,7 @@ def search(w):
 class Window:
     def __init__(self):
         self.root = tkinter.Tk()
+        self.root.title('dictionary')
         self.root.geometry('500x345')
 
         self.entry = tkinter.Entry(self.root, width=48)
