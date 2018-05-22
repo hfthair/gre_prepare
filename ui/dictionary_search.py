@@ -6,7 +6,7 @@ from tkinter.font import Font
 from peewee import fn
 from dictionary.iciba import search as search_iciba
 from book_v3000.book import search as bookv3000
-from dictionary.model import Word
+from dictionary.model import Word, save
 
 def search(w):
     finds = Word.select().where(Word.title == w)
@@ -24,7 +24,7 @@ class Window:
         self.entry = tkinter.Entry(self.root, width=48)
         self.entry.grid(row=0, column=1, columnspan=3, pady=8, padx=8)
 
-        self.btn = tkinter.Button(self.root, text='GO', width=8, command=None)
+        self.btn = tkinter.Button(self.root, text='GO', width=8, command=self.on_enter)
         self.btn.grid(row=0, column=4, pady=8)
 
         self.detail = tkinter.Text(self.root, height=21, width=66, relief='sunken')
@@ -68,8 +68,9 @@ class Window:
             self.entry.delete(0, tkinter.END)
             self.entry.insert(tkinter.END, w)
 
-    def on_enter(self, e):
+    def on_enter(self, e=None):
         w = self.entry.get()
+        w = w.strip()
         self.detail.config(state=tkinter.NORMAL)
         self.detail.delete(1.0, tkinter.END)
 
@@ -79,7 +80,12 @@ class Window:
             self.detail.insert(tkinter.END, w + '\n', 'title')
             self.detail.insert(tkinter.END, pron + '\n\n', 'pron')
             self.detail.insert(tkinter.END, brief + '\n\n', 'brief')
+            self.detail.insert(tkinter.END, '---------------\n', 'detail')
             self.detail.insert(tkinter.END, detail + '\n', 'detail')
+
+            self.entry.delete(0, tkinter.END)
+
+            save(w, pron, brief, detail)
         except Exception as e:
             self.detail.insert(tkinter.END, str(e), 'error')
 
