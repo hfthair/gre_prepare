@@ -44,7 +44,7 @@ label.grid(row=0, column=0, columnspan=4)
 btn = tkinter.Button(root, text='pause')
 btn.grid(row=1, column=1)
 
-def pause_or_resume():
+def pause_or_resume(e=None):
     text = btn['text']
     if text == 'pause':
         timer.pause()
@@ -59,6 +59,7 @@ def reset():
     btn['text'] = 'pause'
 tkinter.Button(root, text='reset', command=reset).grid(row=1, column=2)
 
+root.bind('<space>', pause_or_resume)
 root.call('wm', 'attributes', '.', '-topmost', '1')
 
 def go():
