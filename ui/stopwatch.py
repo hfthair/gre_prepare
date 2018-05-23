@@ -39,10 +39,10 @@ root = tkinter.Tk()
 root.title('stopwatch')
 
 label = tkinter.Label(root, text="Welcome!", fg="black", font="Verdana 30 bold")
-label.grid(row=0, column=0, columnspan=4)
+label.grid(row=0, column=0, columnspan=4, pady=3)
 
-btn = tkinter.Button(root, text='pause')
-btn.grid(row=1, column=1)
+btn = tkinter.Button(root, text='pause', width=8)
+btn.grid(row=1, column=1, pady=3)
 
 def pause_or_resume(e=None):
     text = btn['text']
@@ -57,7 +57,7 @@ btn.configure(command=pause_or_resume)
 def reset():
     timer.reset()
     btn['text'] = 'pause'
-tkinter.Button(root, text='reset', command=reset).grid(row=1, column=2)
+tkinter.Button(root, text='reset', width=8, command=reset).grid(row=1, column=2, pady=3)
 
 root.bind('<space>', pause_or_resume)
 root.call('wm', 'attributes', '.', '-topmost', '1')

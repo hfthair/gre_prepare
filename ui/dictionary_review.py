@@ -98,7 +98,7 @@ class Window:
 
     def update(self, d, ws, touch=False):
         self.tv.delete(*self.tv.get_children())
-        self.root.title(str(d))
+        self.root.title(str(d) + '  --- (' + str(len(ws)) + ')')
         first = None
         for w in ws:
             br = ' | '.join(w.brief.splitlines())
@@ -144,7 +144,7 @@ class Window:
 
         self.cur = None
         self.stack = []
-        self.update('marked' , r, True)
+        self.update('marked' , list(r), True)
 
     def update_detail(self):
         sels = self.tv.selection()
