@@ -1,6 +1,5 @@
 import tkinter
 import datetime
-import init_path
 from tkinter import ttk
 from tkinter.font import Font
 from peewee import fn
