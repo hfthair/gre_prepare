@@ -65,17 +65,19 @@ if os.path.exists(pickle_path):
     with open(pickle_path, 'rb') as f:
         byTitle, arrayAll, byList = pickle.load(f)
 else:
+    import pandas as pd
+
     with open(os.path.join(__dir, 'static/source_from_github.txt'), encoding='utf8') as f:
         c = f.read()
         sp = (i.strip().replace('A: ', ' ') for i in c.split('Q:') if i.strip())
         tps = (create_word(i) for i in sp)
         for i in tps:
-            arrayAll.append(i)
             if i.title in byTitle:
                 print('!!!!! dupulicated in source --> ' + i.title)
+                continue
+            arrayAll.append(i)
             byTitle[i.title] = i
 
-    import pandas as pd
     for i in range(1, 32):
         byList[i] = []
         sheet = pd.read_excel(os.path.join(__dir, 'static/GRE3000.xlsx'), 'L' + str(i), header=None)
@@ -100,7 +102,7 @@ def search(w):
 
 
 
-def synonym_in_3000(w):
+def synonym(w):
     res = []
     for m in w.means:
         s = m.synonym

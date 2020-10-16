@@ -1,9 +1,9 @@
 import datetime
-import init_path
 from peewee import fn
 from colorama import init, Fore, Style
 from book_v3000 import book
 from book_v3000.model import Word
+from util.tools import iinput
 
 init()
 
@@ -29,7 +29,7 @@ def print_ws(ws, touch):
         cnt += 1
 
         printw(book.byTitle[w.title], cnt)
-        q = input()
+        q = iinput(Fore.BLUE + "  <ENTER> next; <q> quit")
         if touch:
             w.touch()
         if q == 'q':
@@ -39,11 +39,13 @@ def task_for_today():
     ws = get_data_of_day(datetime.date.today(), datetime.date.today())
 
     if ws.count() > 30:
-        print('==== review today ({}) ===='.format(ws.count()))
+        print(Fore.BLUE + '==== review today ({}) ===='.format(ws.count()))
+        print(Fore.BLUE + '<q> to quit')
         ws = ws.order_by(fn.random())
         print_ws(ws, False)
     else:
-        print('==== new today ====')
+        print(Fore.BLUE + '==== new today ====')
+        print(Fore.BLUE + '<q> to quit')
         ws = Word.select().where(Word.last_modify.is_null()).\
             order_by(Word.lid, Word.count.desc()).\
             limit(80)
@@ -63,4 +65,4 @@ def task_for_review():
     print_ws(ws, False)
 
 import fire
-fire.Fire({'today': task_for_today, 'review': task_for_review})
+fire.Fire({'today': task_for_today, 'recent': task_for_review})
