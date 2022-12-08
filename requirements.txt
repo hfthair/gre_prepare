@@ -2,7 +2,7 @@ attrs @ git+https://github.com/python-attrs/attrs.git@0eae613ce1a4defddf1384ece5
 autopep8==1.5.4
 beautifulsoup4==4.9.3
 bs4==0.0.1
-certifi==2020.6.20
+certifi==2022.12.7
 chardet==3.0.4
 colorama==0.4.4
 fire==0.3.1
